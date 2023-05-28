@@ -38,14 +38,7 @@ def plot(x_coord, y_coord, theta, L1, L2):
     canvas.draw()
 
     # placing the canvas on the Tkinter window
-    canvas.get_tk_widget().pack()
-
-    # creating the Matplotlib toolbar
-    toolbar = NavigationToolbar2Tk(canvas, RightFrame)
-    toolbar.update()
-
-    # placing the toolbar on the Tkinter window
-    canvas.get_tk_widget().pack()
+    canvas.get_tk_widget().place(relx = 0, rely = 0)
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state():
