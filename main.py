@@ -3,6 +3,8 @@ import tkinter as tk
 import time
 import matplotlib.animation as animation
 from matplotlib import style
+import numpy as np
+from scipy.optimize import fsolve
 
 style.use('ggplot') #matplotlib settings
 
@@ -25,6 +27,8 @@ def set_coordinates_state():
     x_coord = x_coord_entry.get()
     y_coord = y_coord_entry.get()
     calculate_angles(x_coord, y_coord)
+
+def func(angles):
 
 #set up serial comms
 #ser = serial.Serial('com5', 9600) #create Serial Object
