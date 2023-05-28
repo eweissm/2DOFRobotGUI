@@ -51,7 +51,7 @@ UpdateCoordsButton = tk.Button(EntryFrame,
                                    command=set_coordinates_state,
                                    height=4,
                                    fg="black",
-                                   width=8,
+                                   width=20,
                                    bd=5,
                                    activebackground='green'
                                    )
