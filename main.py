@@ -5,13 +5,16 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib import pyplot as plt
 import numpy as np
-from scipy.optimize import fsolve
+import scipy.optimize
 
 # caclulate the angles using inverse kinematics
 def calculate_angles(x, y, L1, L2):
     global theta0
-    theta0 = [0, 0]
-    return fsolve(func, theta0, tuple((x, y, L1, L2)))
+    theta0 = [0,0]
+    #scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
+    limits = scipy.optimize.Bounds(lb=[0, 0], ub=[np.pi, np.pi], keep_feasible=False)
+    solution= scipy.optimize.minimize(func, theta0, args=(tuple((x, y, L1, L2))), method=None, jac=None, hess=None, hessp = None, bounds=limits, constraints=None, tol=None, callback=None, options=None )
+    return solution.x
 
 #generate and plot the graph
 def plot(x_coord, y_coord, theta, L1, L2):
@@ -48,8 +51,8 @@ def set_coordinates_state():
     global L1
     global L2
     #define arm lengths
-    L1 = 4*np.sqrt(2)
-    L2 = 4
+    L1 = 10
+    L2 = 10
 
     #get the inputs
     x_coord = float(x_coord_entry.get())
@@ -71,8 +74,11 @@ def set_coordinates_state():
     ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
-    return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x,
-            L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
+    #return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
+    return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 +
+            (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
+
+#theta = [0,0]
 
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
 ser = serial.Serial('com4', 9600) #create Serial Object
