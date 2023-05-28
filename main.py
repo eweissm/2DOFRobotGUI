@@ -4,11 +4,21 @@ import time
 import matplotlib.animation as animation
 from matplotlib import style
 
+style.use('ggplot') #matplotlib settings
+
+# caclulate the angles using inverse kinematics
 def calculate_angles(x, y):
-    #caclulate the angles using inverse kinematics
+    global L1
+    global L2
+    L1 = 10
+    L2 = 10
+
     global theta1 #angle of joint 1
     global theta2 #angle of joint 2
 
+
+
+#when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state():
     global x_coord
     global y_coord
@@ -46,6 +56,10 @@ x_coord_entry.pack(side='top', ipadx=0, padx=0, pady=0)
 y_coord_entry = tk.Entry(EntryFrame)
 y_coord_entry.pack(side='top', ipadx=0, padx=0, pady=0)
 
+#set intial coords to zero.
+x_coord_entry.insert(0,0)
+y_coord_entry.insert(0,0)
+
 UpdateCoordsButton = tk.Button(EntryFrame,
                                    text="Update Coordinates",
                                    command=set_coordinates_state,
@@ -60,7 +74,7 @@ UpdateCoordsButton.pack(side='top', ipadx=10, padx=10, pady=40)
 TextFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 EntryFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
-# Fill in the Automated controls Side----------------------------------------------------------------------------------------------------------------------------------------
+# Fill in the right Side of GUI----------------------------------------------------------------------------------------------------------------------------------------
 RightFrame = tk.Frame(master=tkTop, width=600, bg="gray")
 
 
