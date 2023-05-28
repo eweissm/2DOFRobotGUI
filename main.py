@@ -12,7 +12,7 @@ style.use('ggplot') #matplotlib settings
 def calculate_angles(x, y):
     global theta0
     theta0 = [0, 0]
-    return fsolve(func, theta0, (x, y))
+    return fsolve(func, theta0, tuple((x, y)))
 
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
@@ -20,8 +20,8 @@ def set_coordinates_state():
     global x_coord
     global y_coord
     global theta #angles of joints 1 and 2
-    x_coord = x_coord_entry.get()
-    y_coord = y_coord_entry.get()
+    x_coord = float(x_coord_entry.get())
+    y_coord = float(y_coord_entry.get())
     theta = calculate_angles(x_coord, y_coord)
     print(theta)
 
