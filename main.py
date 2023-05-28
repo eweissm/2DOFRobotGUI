@@ -1,36 +1,69 @@
 import serial
 import tkinter as tk
 import time
-import matplotlib.animation as animation
-from matplotlib import style
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib import pyplot as plt
 import numpy as np
 from scipy.optimize import fsolve
 
-style.use('ggplot') #matplotlib settings
-
 # caclulate the angles using inverse kinematics
-def calculate_angles(x, y):
+def calculate_angles(x, y, L1, L2):
     global theta0
     theta0 = [0, 0]
-    return fsolve(func, theta0, tuple((x, y)))
+    return fsolve(func, theta0, tuple((x, y, L1, L2)))
 
+#generate and plot the graph
+def plot(x_coord, y_coord, theta, L1, L2):
+    # the figure that will contain the plot
+    fig = Figure(figsize=(5, 5), dpi=100)
+
+    # adding the subplot
+    plot1 = fig.add_subplot(111)
+
+    plot1.xlim(-(L1+L2), (L1+L2))
+    plot1.ylim(-(L1+L2), (L1+L2))
+
+    # plotting the graph
+    plot1.plot(x_coord, y_coord, marker="o", markersize=20,)
+
+    # creating the Tkinter canvas
+    # containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig, master=RightFrame)
+    canvas.draw()
+
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().pack()
+
+    # creating the Matplotlib toolbar
+    toolbar = NavigationToolbar2Tk(canvas, RightFrame)
+    toolbar.update()
+
+    # placing the toolbar on the Tkinter window
+    canvas.get_tk_widget().pack()
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state():
     global x_coord
     global y_coord
     global theta #angles of joints 1 and 2
-    x_coord = float(x_coord_entry.get())
-    y_coord = float(y_coord_entry.get())
-    theta = calculate_angles(x_coord, y_coord)
-    print(theta)
-
-
-def func(angles, x, y):
     global L1
     global L2
+    #define arm lengths
     L1 = 4*np.sqrt(2)
     L2 = 4
+
+    #get the inputs
+    x_coord = float(x_coord_entry.get())
+    y_coord = float(y_coord_entry.get())
+
+    #perform inverse Kinematics calculation
+    theta = calculate_angles(x_coord, y_coord, L1, L2)
+    print(theta)
+    #generate and plot the graph
+    plot(x_coord, y_coord, theta, L1, L2)
+
+def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x,
             L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
 #set up serial comms
