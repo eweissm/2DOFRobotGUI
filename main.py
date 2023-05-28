@@ -21,12 +21,12 @@ def plot(x_coord, y_coord, theta, L1, L2):
     # adding the subplot
     plot1 = fig.add_subplot(111)
 
-    plot1.xlim(-(L1+L2), (L1+L2))
-    plot1.ylim(-(L1+L2), (L1+L2))
-
     # plotting the graph
-    plot1.plot(x_coord, y_coord, marker="o", markersize=20,)
-
+    plot1.plot(0, 0, marker="o", markersize=20)
+    plot1.plot(x_coord, y_coord, marker="o", markersize=20 )
+    plot1.plot(L1*np.cos(theta[0]), L1*np.sin(theta[0]), marker="o", markersize=20)
+    plot1.plot([0, L1*np.cos(theta[0])], [0, L1*np.sin(theta[0])])
+    plot1.plot([L1 * np.cos(theta[0]),x_coord], [L1 * np.sin(theta[0]), y_coord])
     # creating the Tkinter canvas
     # containing the Matplotlib figure
     canvas = FigureCanvasTkAgg(fig, master=RightFrame)
