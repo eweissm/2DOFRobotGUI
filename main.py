@@ -10,28 +10,29 @@ style.use('ggplot') #matplotlib settings
 
 # caclulate the angles using inverse kinematics
 def calculate_angles(x, y):
-    global theta1 #angle of joint 1
-    global theta2 #angle of joint 2
     global theta0
     theta0 = [0, 0]
-    [theta1,theta2] = fsolve()
+    return fsolve(func, theta0, (x, y))
 
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state():
     global x_coord
     global y_coord
+    global theta #angles of joints 1 and 2
     x_coord = x_coord_entry.get()
     y_coord = y_coord_entry.get()
-    calculate_angles(x_coord, y_coord)
+    theta = calculate_angles(x_coord, y_coord)
+    print(theta)
+
 
 def func(angles, x, y):
     global L1
     global L2
-    L1 = 10
-    L2 = 10
-    return [L1*np.cos(angles[0])+L2*((np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0])))-x,
-            L1*np.sin(angles[0])+L2*((np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0])))-y]
+    L1 = 4*np.sqrt(2)
+    L2 = 4
+    return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x,
+            L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
 #set up serial comms
 #ser = serial.Serial('com5', 9600) #create Serial Object
 #time.sleep(3) #delay 3 seconds to allow serial com to get established
