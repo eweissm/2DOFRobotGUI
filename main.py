@@ -21,8 +21,10 @@ def plot(x_coord, y_coord, theta, L1, L2):
     # adding the subplot
     plot1 = fig.add_subplot(111)
 
+    #set limits for graphs
     plot1.set_xlim([-(L1+L2), (L1+L2)])
     plot1.set_ylim([-(L1+L2), (L1+L2)])
+    plot1.grid()
 
     # plotting the graph
     plot1.plot(0, 0, marker="o", markersize=20)
