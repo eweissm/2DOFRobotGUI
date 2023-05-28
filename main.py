@@ -1,16 +1,70 @@
-# This is a sample Python script.
+import serial
+import tkinter as tk
+import time
+import matplotlib.animation as animation
+from matplotlib import style
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+def calculate_angles(x, y):
+    #caclulate the angles using inverse kinematics
+    global theta1 #angle of joint 1
+    global theta2 #angle of joint 2
+
+def set_coordinates_state():
+    global x_coord
+    global y_coord
+    x_coord = x_coord_entry.get()
+    y_coord = y_coord_entry.get()
+    calculate_angles(x_coord, y_coord)
+
+#set up serial comms
+#ser = serial.Serial('com5', 9600) #create Serial Object
+#time.sleep(3) #delay 3 seconds to allow serial com to get established
+
+# Build GUI------------------------------------------------------------------------------------------------------------------------------------------------------------
+tkTop = tk.Tk()  # Create GUI Box
+tkTop.geometry('1200x800')  # size of GUI
+tkTop.title("2 DOF GUI")  # title in top left of window
+
+Title = tk.Label(text='Enter the desired coordinates of the 2 DOF arm', font=("Courier", 14, 'bold')).pack()  # Title on top middle of screen
+
+# Fill in the left Side----------------------------------------------------------------------------------------------------------------------------------------
+leftFrame = tk.Frame(master=tkTop, width=600) # create frame for the entry controls
+
+leftFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+
+TextFrame = tk.Frame(master=leftFrame, width=100)
+x_input_Lable = tk.Label(master=TextFrame, text='X Coordinate:',
+                                 font=("Courier", 12, 'bold')).pack(side='top', ipadx=0, padx=0, pady=0)
+y_input_Lable = tk.Label(master=TextFrame, text='Y Coordinate:',
+                                 font=("Courier", 12, 'bold')).pack(side='top', ipadx=0, padx=0, pady=0)
+
+EntryFrame = tk.Frame(master=leftFrame, width=100)
+
+x_coord_entry = tk.Entry(EntryFrame)
+x_coord_entry.pack(side='top', ipadx=0, padx=0, pady=0)
+
+y_coord_entry = tk.Entry(EntryFrame)
+y_coord_entry.pack(side='top', ipadx=0, padx=0, pady=0)
+
+UpdateCoordsButton = tk.Button(EntryFrame,
+                                   text="Update Coordinates",
+                                   command=set_coordinates_state,
+                                   height=4,
+                                   fg="black",
+                                   width=8,
+                                   bd=5,
+                                   activebackground='green'
+                                   )
+UpdateCoordsButton.pack(side='top', ipadx=10, padx=10, pady=40)
+
+TextFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+EntryFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
+
+# Fill in the Automated controls Side----------------------------------------------------------------------------------------------------------------------------------------
+RightFrame = tk.Frame(master=tkTop, width=600, bg="gray")
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+RightFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+tk.mainloop() # run loop watching for gui interactions
