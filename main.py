@@ -10,14 +10,11 @@ style.use('ggplot') #matplotlib settings
 
 # caclulate the angles using inverse kinematics
 def calculate_angles(x, y):
-    global L1
-    global L2
-    L1 = 10
-    L2 = 10
-
     global theta1 #angle of joint 1
     global theta2 #angle of joint 2
-
+    global theta0
+    theta0 = [0, 0]
+    [theta1,theta2] = fsolve()
 
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
@@ -28,8 +25,13 @@ def set_coordinates_state():
     y_coord = y_coord_entry.get()
     calculate_angles(x_coord, y_coord)
 
-def func(angles):
-
+def func(angles, x, y):
+    global L1
+    global L2
+    L1 = 10
+    L2 = 10
+    return [L1*np.cos(angles[0])+L2*((np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0])))-x,
+            L1*np.sin(angles[0])+L2*((np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0])))-y]
 #set up serial comms
 #ser = serial.Serial('com5', 9600) #create Serial Object
 #time.sleep(3) #delay 3 seconds to allow serial com to get established
