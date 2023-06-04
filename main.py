@@ -13,7 +13,8 @@ def calculate_angles(x, y, L1, L2):
     theta0 = [0,0]
     #scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
     limits = scipy.optimize.Bounds(lb=[0, 0], ub=[np.pi, np.pi], keep_feasible=False)
-    solution= scipy.optimize.minimize(func, theta0, args=(tuple((x, y, L1, L2))), method=None, jac=None, hess=None, hessp = None, bounds=limits, constraints=None, tol=None, callback=None, options=None )
+    solution= scipy.optimize.minimize(func, theta0, args=(tuple((x, y, L1, L2))), method=None, jac=None, hess=None, hessp = None, bounds=limits, constraints=None, tol=None, callback=None, options={'maxiter':10000} )
+    print(solution)
     return solution.x
 
 #generate and plot the graph
