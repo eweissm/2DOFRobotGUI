@@ -9,29 +9,37 @@ import scipy.optimize
 
 
 # calculate the angles using inverse kinematics
-theta0 = [np.pi/4,np.pi/4]
+theta0 = [np.pi/2,np.pi/2]
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
+    global counter
 
-    ErrorFlag= False
+    counter=0
+    ErrorFlag= True
 
-    solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
+    while(ErrorFlag and counter<3):
 
-    #normalize angles
-    solution[0] = NormalizeAngle(solution[0])
-    solution[1] = NormalizeAngle(solution[1])
+        solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
 
-    #cons=({'type': 'eq', 'fun': lambda x:  x[0] - 2 * x[1] + 2}, {'type': 'eq', 'fun': lambda x: -x[0] - 2 * x[1] + 6},)
-    #bnds = ((0, 0), (np.pi, np.pi))
-    #solution= scipy.optimize.minimize(func, theta0, args=(tuple((x, y, L1, L2))), method=None, jac=None, hess=None, hessp = None, bounds=bnds, constraints=cons, tol=None, callback=None, options={'maxiter':10000} )
-    #solution = scipy.optimize.least_squares(func, theta0,bounds = bnds,args=(tuple((x, y, L1, L2))), loss = 'arctan')
-    #print(solution)
-    #return solution.x
+        #normalize angles
+        solution[0] = NormalizeAngle(solution[0])
+        solution[1] = NormalizeAngle(solution[1])
 
-    if solution[0] >np.pi or solution[0] <0 or solution[1] >np.pi or solution[1] <0:
+        if solution[0] > np.pi or solution[0] < 0 or solution[1] > np.pi or solution[1] < 0:
+            counter = counter+1
+            rng = np.random.default_rng(12345)
+            rFloat = np.pi*2*(rng.random(2)-.5)
+            theta0= [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
+        else:
+            ErrorFlag = False
+
+        print(theta0)
+
+    if ErrorFlag:
         print("Error: Angles out of bounds")
-        ErrorFlag = True
+    else:
+        theta0 = solution
 
     return solution
 
