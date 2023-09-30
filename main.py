@@ -120,8 +120,9 @@ def StartPathFollow():
     pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
     pathX= -pathX-4
 
-    #for i in range(len(pathX)):
-
+    for i in range(len(pathX)):
+        set_coordinates_state(pathX[i], pathY[i])
+        time.sleep(.1)
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
@@ -139,12 +140,12 @@ def set_coordinates_state(x_coord, y_coord):
         print(theta * 180 / np.pi)
         #generate and plot the graph
         plot(x_coord, y_coord, theta, L1, L2)
-        #theta1_deg = int(theta[0] * 180 / np.pi)
-        #theta2_deg = int(theta[1] * 180 / np.pi)
+        theta1_deg = int(theta[0] * 180 / np.pi)
+        theta2_deg = int(theta[1] * 180 / np.pi)
         #send serial data to arduino
-        ser.write(bytes( str(x_coord), 'UTF-8'))
+        ser.write(bytes( str(theta1_deg), 'UTF-8'))
         ser.write(bytes('A', 'UTF-8'))
-        ser.write(bytes( str(y_coord), 'UTF-8'))
+        ser.write(bytes( str(theta2_deg), 'UTF-8'))
         ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
