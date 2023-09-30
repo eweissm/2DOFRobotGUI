@@ -7,15 +7,24 @@ from matplotlib import pyplot as plt
 import numpy as np
 import scipy.optimize
 
-# caclulate the angles using inverse kinematics
+
+# calculate the angles using inverse kinematics
 def calculate_angles(x, y, L1, L2):
     global theta0
-    theta0 = [0,0]
-    #scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
-    limits = scipy.optimize.Bounds(lb=[0, 0], ub=[np.pi, np.pi], keep_feasible=False)
-    solution= scipy.optimize.minimize(func, theta0, args=(tuple((x, y, L1, L2))), method=None, jac=None, hess=None, hessp = None, bounds=limits, constraints=None, tol=None, callback=None, options={'maxiter':10000} )
-    print(solution)
-    return solution.x
+    theta0 = [np.pi/4,np.pi/4]
+    solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
+
+    #normalize angles
+    solution[0] = NormalizeAngle(solution[0])
+    solution[1] = NormalizeAngle(solution[1])
+
+    #cons=({'type': 'eq', 'fun': lambda x:  x[0] - 2 * x[1] + 2}, {'type': 'eq', 'fun': lambda x: -x[0] - 2 * x[1] + 6},)
+    #bnds = ((0, 0), (np.pi, np.pi))
+    #solution= scipy.optimize.minimize(func, theta0, args=(tuple((x, y, L1, L2))), method=None, jac=None, hess=None, hessp = None, bounds=bnds, constraints=cons, tol=None, callback=None, options={'maxiter':10000} )
+    #solution = scipy.optimize.least_squares(func, theta0,bounds = bnds,args=(tuple((x, y, L1, L2))), loss = 'arctan')
+    #print(solution)
+    #return solution.x
+    return solution
 
 #generate and plot the graph
 def plot(x_coord, y_coord, theta, L1, L2):
@@ -44,6 +53,18 @@ def plot(x_coord, y_coord, theta, L1, L2):
     # placing the canvas on the Tkinter window
     canvas.get_tk_widget().place(relx = 0, rely = 0)
 
+
+#normalize angle between 0 and 2*pi
+def NormalizeAngle(angle):
+    if angle > 2*np.pi:
+        solution = angle- ((angle % 2*np.pi) * 2*np.pi)
+    elif angle < 0:
+        solution = angle + ((angle % 2 * np.pi) * 2 * np.pi)
+    else:
+        solution = angle
+
+    return solution
+
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state():
     global x_coord
@@ -64,25 +85,24 @@ def set_coordinates_state():
     print(theta * 180 / np.pi)
     #generate and plot the graph
     plot(x_coord, y_coord, theta, L1, L2)
-    theta1_deg = int(theta[0] * 180 / np.pi)
-    theta2_deg = int(theta[1] * 180 / np.pi)
+    #theta1_deg = int(theta[0] * 180 / np.pi)
+    #theta2_deg = int(theta[1] * 180 / np.pi)
 
     #send serial data to arduino
 
-    ser.write(bytes( str(theta1_deg), 'UTF-8'))
+    ser.write(bytes( str(x_coord), 'UTF-8'))
     ser.write(bytes('A', 'UTF-8'))
-    ser.write(bytes( str(theta2_deg), 'UTF-8'))
+    ser.write(bytes( str(y_coord), 'UTF-8'))
     ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
-    #return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
-    return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 +
-            (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
+    return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
+    #return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 + (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
 
 #theta = [0,0]
 
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
-ser = serial.Serial('com4', 9600) #create Serial Object
+ser = serial.Serial('com3', 9600) #create Serial Object
 time.sleep(3) #delay 3 seconds to allow serial com to get established
 
 # Build GUI------------------------------------------------------------------------------------------------------------------------------------------------------------
