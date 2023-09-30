@@ -11,6 +11,9 @@ import scipy.optimize
 # calculate the angles using inverse kinematics
 def calculate_angles(x, y, L1, L2):
     global theta0
+    global ErrorFlag
+
+    ErrorFlag= False
     theta0 = [np.pi/4,np.pi/4]
     solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
 
@@ -24,6 +27,11 @@ def calculate_angles(x, y, L1, L2):
     #solution = scipy.optimize.least_squares(func, theta0,bounds = bnds,args=(tuple((x, y, L1, L2))), loss = 'arctan')
     #print(solution)
     #return solution.x
+
+    if solution[0] >np.pi or solution[0] <0 or solution[1] >np.pi or solution[1] <0:
+        print("Error: Angles out of bounds")
+        ErrorFlag = True
+
     return solution
 
 #generate and plot the graph
@@ -72,6 +80,7 @@ def set_coordinates_state():
     global theta #angles of joints 1 and 2
     global L1
     global L2
+    global ErrorFlag
     #define arm lengths
     L1 = 10
     L2 = 10
@@ -82,18 +91,17 @@ def set_coordinates_state():
 
     #perform inverse Kinematics calculation
     theta = calculate_angles(x_coord, y_coord, L1, L2)
-    print(theta * 180 / np.pi)
-    #generate and plot the graph
-    plot(x_coord, y_coord, theta, L1, L2)
-    #theta1_deg = int(theta[0] * 180 / np.pi)
-    #theta2_deg = int(theta[1] * 180 / np.pi)
-
-    #send serial data to arduino
-
-    ser.write(bytes( str(x_coord), 'UTF-8'))
-    ser.write(bytes('A', 'UTF-8'))
-    ser.write(bytes( str(y_coord), 'UTF-8'))
-    ser.write(bytes('B', 'UTF-8'))
+    if not ErrorFlag:
+        print(theta * 180 / np.pi)
+        #generate and plot the graph
+        plot(x_coord, y_coord, theta, L1, L2)
+        #theta1_deg = int(theta[0] * 180 / np.pi)
+        #theta2_deg = int(theta[1] * 180 / np.pi)
+        #send serial data to arduino
+        ser.write(bytes( str(x_coord), 'UTF-8'))
+        ser.write(bytes('A', 'UTF-8'))
+        ser.write(bytes( str(y_coord), 'UTF-8'))
+        ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
