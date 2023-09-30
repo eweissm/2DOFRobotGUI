@@ -9,12 +9,13 @@ import scipy.optimize
 
 
 # calculate the angles using inverse kinematics
+theta0 = [np.pi/4,np.pi/4]
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
 
     ErrorFlag= False
-    theta0 = [np.pi/4,np.pi/4]
+
     solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
 
     #normalize angles
@@ -37,17 +38,24 @@ def calculate_angles(x, y, L1, L2):
 #generate and plot the graph
 def plot(x_coord, y_coord, theta, L1, L2):
     # the figure that will contain the plot
-    fig = Figure(figsize=(5, 5), dpi=100)
+    fig = Figure(figsize=(8, 8), dpi=100)
 
     # adding the subplot
     plot1 = fig.add_subplot(111)
 
     #set limits for graphs
-    plot1.set_xlim([-(L1+L2), (L1+L2)])
-    plot1.set_ylim([-(L1+L2), (L1+L2)])
+    plot1.set_xlim([-(L1+L2+2), (L1+L2+2)])
+    plot1.set_ylim([-(L1+L2+2), (L1+L2+2)])
     plot1.grid()
 
-    # plotting the graph
+    #plotting work space
+    x, y = generate_semicircle(0, 0 , L2, 0.1)
+    plot1.plot(y-L1, -x, color='black', linestyle='dashed')
+    plot1.plot(y + L1, x, color='black', linestyle='dashed')
+    x, y = generate_semicircle(0, 0, L2+L1, 0.1)
+    plot1.plot(y , x, color='black', linestyle='dashed')
+
+    # plotting the arm
     plot1.plot(0, 0, marker="o", markersize=20)
     plot1.plot(x_coord, y_coord, marker="o", markersize=10 )
     plot1.plot(L1*np.cos(theta[0]), L1*np.sin(theta[0]), marker="o", markersize=20)
@@ -72,6 +80,23 @@ def NormalizeAngle(angle):
         solution = angle
 
     return solution
+
+def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
+    """
+    generates coordinates for a semicircle, centered at center_x, center_y
+    """
+
+    x = np.arange(center_x, center_x+radius+stepsize, stepsize)
+    y = np.sqrt(radius**2 - x**2)
+
+    # since each x value has two corresponding y-values, duplicate x-axis.
+    # [::-1] is required to have the correct order of elements for plt.plot.
+    x = np.concatenate([x,x[::-1]])
+
+    # concatenate y and flipped y.
+    y = np.concatenate([y,-y[::-1]])
+
+    return x, y + center_y
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state():
