@@ -8,6 +8,10 @@ import numpy as np
 import scipy.optimize
 
 
+
+
+
+
 # calculate the angles using inverse kinematics
 theta0 = [np.pi/2,np.pi/2]
 def calculate_angles(x, y, L1, L2):
@@ -46,6 +50,7 @@ def calculate_angles(x, y, L1, L2):
 
 #generate and plot the graph
 def plot(x_coord, y_coord, theta, L1, L2):
+
     # the figure that will contain the plot
     fig = Figure(figsize=(8, 8), dpi=100)
 
@@ -63,6 +68,10 @@ def plot(x_coord, y_coord, theta, L1, L2):
     plot1.plot(y + L1, x, color='black', linestyle='dashed')
     x, y = generate_semicircle(0, 0, L2+L1, 0.1)
     plot1.plot(y , x, color='black', linestyle='dashed')
+
+    #plotting path
+    pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
+    plot1.plot(-pathX-4, pathY, color='blue', linestyle='dashed')
 
     # plotting the arm
     plot1.plot(0, 0, marker="o", markersize=20)
@@ -107,10 +116,15 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
 
     return x, y + center_y
 
+def StartPathFollow():
+    pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
+    pathX= -pathX-4
+
+    #for i in range(len(pathX)):
+
+
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
-def set_coordinates_state():
-    global x_coord
-    global y_coord
+def set_coordinates_state(x_coord, y_coord):
     global theta #angles of joints 1 and 2
     global L1
     global L2
@@ -118,10 +132,6 @@ def set_coordinates_state():
     #define arm lengths
     L1 = 10
     L2 = 10
-
-    #get the inputs
-    x_coord = float(x_coord_entry.get())
-    y_coord = float(y_coord_entry.get())
 
     #perform inverse Kinematics calculation
     theta = calculate_angles(x_coord, y_coord, L1, L2)
@@ -179,7 +189,7 @@ y_coord_entry.insert(0,0)
 
 UpdateCoordsButton = tk.Button(EntryFrame,
                                    text="Update Coordinates",
-                                   command=set_coordinates_state,
+                                   command=lambda:set_coordinates_state(float(x_coord_entry.get()),float(y_coord_entry.get())),
                                    height=4,
                                    fg="black",
                                    width=20,
@@ -187,6 +197,17 @@ UpdateCoordsButton = tk.Button(EntryFrame,
                                    activebackground='green'
                                    )
 UpdateCoordsButton.pack(side='top', ipadx=10, padx=10, pady=40)
+
+StartPathButton = tk.Button(EntryFrame,
+                                   text="Follow Path",
+                                   command=StartPathFollow,
+                                   height=4,
+                                   fg="black",
+                                   width=20,
+                                   bd=5,
+                                   activebackground='green'
+                                   )
+StartPathButton.pack(side='top', ipadx=10, padx=10, pady=40)
 
 TextFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 EntryFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
