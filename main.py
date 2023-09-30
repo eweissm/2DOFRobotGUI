@@ -50,6 +50,8 @@ def calculate_angles(x, y, L1, L2):
 
 #generate and plot the graph
 def plot(x_coord, y_coord, theta, L1, L2):
+    global pathX
+    global pathY
 
     # the figure that will contain the plot
     fig = Figure(figsize=(8, 8), dpi=100)
@@ -70,8 +72,7 @@ def plot(x_coord, y_coord, theta, L1, L2):
     plot1.plot(y , x, color='black', linestyle='dashed')
 
     #plotting path
-    pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
-    plot1.plot(-pathX-4, pathY, color='blue', linestyle='dashed')
+    plot1.plot(pathX, pathY, color='blue', linestyle='dashed')
 
     # plotting the arm
     plot1.plot(0, 0, marker="o", markersize=20)
@@ -117,12 +118,12 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
     return x, y + center_y
 
 def StartPathFollow():
-    pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
-    pathX= -pathX-4
+    global pathX
+    global pathY
 
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
-        time.sleep(.1)
+        time.sleep(.25)
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
@@ -152,8 +153,11 @@ def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
     #return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 + (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
 
-#theta = [0,0]
-
+#define path
+#pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
+#pathX= -pathX-4
+pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
+pathY = [-5, -5, -5, -5, -5,   -5,   -5,  -2,   1,   4,   7 , 10, 10,   10,  10, 10, 10, 10,  7,  4,  1, -2, -5]
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
 ser = serial.Serial('com3', 9600) #create Serial Object
 time.sleep(3) #delay 3 seconds to allow serial com to get established
