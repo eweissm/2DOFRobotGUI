@@ -29,7 +29,7 @@ def calculate_angles(x, y, L1, L2):
         if solution[0] > np.pi or solution[0] < 0 or solution[1] > np.pi or solution[1] < 0:
             counter = counter+1
             rng = np.random.default_rng(12345)
-            rFloat = np.pi*2*(rng.random(2)-.5)
+            rFloat = np.pi*(rng.random(2)-.5)
             theta0= [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
         else:
             ErrorFlag = False
@@ -38,6 +38,7 @@ def calculate_angles(x, y, L1, L2):
 
     if ErrorFlag:
         print("Error: Angles out of bounds")
+        theta0 = [np.pi / 2, np.pi / 2]
     else:
         theta0 = solution
 
