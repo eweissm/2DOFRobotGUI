@@ -205,7 +205,6 @@ def ChangeSelectPathButton():
         case 0: #rectangle
             pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
             pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
-
         case 1: #involute of circle
             u = np.linspace(0, 3 * np.pi, 50)
             c = .75
@@ -221,7 +220,6 @@ def ChangeSelectPathButton():
             c = 5
             pathX = (c * np.cos(u)) - 10
             pathY = c * np.sin(2 * u)
-
         case default: #rectangle
             pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
             pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
@@ -239,7 +237,7 @@ tkTop.title("2 DOF GUI")  # title in top left of window
 
 Title = tk.Label(text='Enter the desired coordinates of the 2 DOF arm', font=("Courier", 14, 'bold')).pack()  # Title on top middle of screen
 
-# Fill in the left Side----------------------------------------------------------------------------------------------------------------------------------------
+# Fill in the left Side------------------------------------------------------------------------------------------------
 leftFrame = tk.Frame(master=tkTop, width=600) # create frame for the entry controls
 
 leftFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
@@ -298,7 +296,7 @@ PathSelectorButton.pack(side='top', ipadx=10, padx=10, pady=40)
 TextFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 EntryFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 
-# Fill in the right Side of GUI----------------------------------------------------------------------------------------------------------------------------------------
+# Fill in the right Side of GUI----------------------------------------------------------------------------------------
 RightFrame = tk.Frame(master=tkTop, width=600, bg="gray")
 
 
