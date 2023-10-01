@@ -194,7 +194,7 @@ def ChangeSelectPathButton():
     global L1
     global L2
 
-    numCases = 2
+    numCases = 4
 
     if ActivePath >= numCases-1:
         ActivePath=0
@@ -211,6 +211,16 @@ def ChangeSelectPathButton():
             c = .75
             pathX = (c * (np.cos(u) + u * np.sin(u))) - 10
             pathY = c * (np.sin(u) - u * np.cos(u))
+        case 2:  # Heart
+            u = np.linspace(0,  2 * np.pi, 50)
+            c = .3
+            pathX = (6*c*np.sin(u))**3 - 10
+            pathY = 13*c*np.cos(u)-5*c*np.cos(2*u)-2*c*np.cos(3*u)-c*np.cos(4*u)
+        case 3:  # lemniscate
+            u = np.linspace(0, 2 * np.pi, 50)
+            c = 5
+            pathX = (c * np.cos(u)) - 10
+            pathY = c * np.sin(2 * u)
 
         case default: #rectangle
             pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
