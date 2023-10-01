@@ -153,7 +153,7 @@ def StartPathFollow():
 
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
-        time.sleep(.25)
+        time.sleep(.1)
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
@@ -183,12 +183,40 @@ def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
     #return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 + (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
 
-#define path
-#pathX, pathY = generate_semicircle(0, 0, 4, 0.2)
-#pathX= -pathX-4
+#set path defaults
+ActivePath=0;
 pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
 pathY = [-5, -5, -5, -5, -5,   -5,   -5,  -2,   1,   4,   7 , 10, 10,   10,  10, 10, 10, 10,  7,  4,  1, -2, -5]
+def ChangeSelectPathButton():
+    global ActivePath
+    global pathX
+    global pathY
+    global L1
+    global L2
 
+    numCases = 2
+
+    if ActivePath >= numCases-1:
+        ActivePath=0
+    else:
+        ActivePath=ActivePath+1
+
+    match ActivePath:
+        case 0: #rectangle
+            pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
+            pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
+
+        case 1: #involute of circle
+            u = np.linspace(0, 3 * np.pi, 50)
+            c = .75
+            pathX = (c * (np.cos(u) + u * np.sin(u))) - 10
+            pathY = c * (np.sin(u) - u * np.cos(u))
+
+        case default: #rectangle
+            pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
+            pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
+
+    startupPlot(L1, L2)
 
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
 ser = serial.Serial('com3', 9600) #create Serial Object
@@ -245,6 +273,17 @@ StartPathButton = tk.Button(EntryFrame,
                                    activebackground='green'
                                    )
 StartPathButton.pack(side='top', ipadx=10, padx=10, pady=40)
+
+PathSelectorButton = tk.Button(EntryFrame,
+                                   text="Change Path",
+                                   command=ChangeSelectPathButton,
+                                   height=4,
+                                   fg="black",
+                                   width=20,
+                                   bd=5,
+                                   activebackground='green'
+                                   )
+PathSelectorButton.pack(side='top', ipadx=10, padx=10, pady=40)
 
 TextFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 EntryFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
