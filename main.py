@@ -8,10 +8,8 @@ import numpy as np
 import scipy.optimize
 
 
-
-
-
-
+L1 = 10
+L2 = 10
 # calculate the angles using inverse kinematics
 theta0 = [np.pi/2,np.pi/2]
 def calculate_angles(x, y, L1, L2):
@@ -88,6 +86,38 @@ def plot(x_coord, y_coord, theta, L1, L2):
     # placing the canvas on the Tkinter window
     canvas.get_tk_widget().place(relx = 0, rely = 0)
 
+def startupPlot(L1, L2):
+    global pathX
+    global pathY
+
+    # the figure that will contain the plot
+    fig = Figure(figsize=(8, 8), dpi=100)
+
+    # adding the subplot
+    plot1 = fig.add_subplot(111)
+
+    # set limits for graphs
+    plot1.set_xlim([-(L1 + L2 + 2), (L1 + L2 + 2)])
+    plot1.set_ylim([-(L1 + L2 + 2), (L1 + L2 + 2)])
+    plot1.grid()
+
+    # plotting work space
+    x, y = generate_semicircle(0, 0, L2, 0.1)
+    plot1.plot(y - L1, -x, color='black', linestyle='dashed')
+    plot1.plot(y + L1, x, color='black', linestyle='dashed')
+    x, y = generate_semicircle(0, 0, L2 + L1, 0.1)
+    plot1.plot(y, x, color='black', linestyle='dashed')
+
+    # plotting path
+    plot1.plot(pathX, pathY, color='blue', linestyle='dashed')
+
+    # creating the Tkinter canvas
+    # containing the Matplotlib figure
+    canvas = FigureCanvasTkAgg(fig, master=RightFrame)
+    canvas.draw()
+
+    # placing the canvas on the Tkinter window
+    canvas.get_tk_widget().place(relx=0, rely=0)
 
 #normalize angle between 0 and 2*pi
 def NormalizeAngle(angle):
@@ -158,6 +188,8 @@ def func(angles, x, y, L1, L2):
 #pathX= -pathX-4
 pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
 pathY = [-5, -5, -5, -5, -5,   -5,   -5,  -2,   1,   4,   7 , 10, 10,   10,  10, 10, 10, 10,  7,  4,  1, -2, -5]
+
+
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
 ser = serial.Serial('com3', 9600) #create Serial Object
 time.sleep(3) #delay 3 seconds to allow serial com to get established
@@ -222,6 +254,6 @@ RightFrame = tk.Frame(master=tkTop, width=600, bg="gray")
 
 
 RightFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
-
+startupPlot(L1, L2)
 
 tk.mainloop() # run loop watching for gui interactions
