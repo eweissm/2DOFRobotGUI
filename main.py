@@ -227,7 +227,7 @@ def ChangeSelectPathButton():
     startupPlot(L1, L2)
 
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
-ser = serial.Serial('com3', 9600) #create Serial Object
+ser = serial.Serial('com4', 9600) #create Serial Object
 time.sleep(3) #delay 3 seconds to allow serial com to get established
 
 # Build GUI------------------------------------------------------------------------------------------------------------------------------------------------------------
