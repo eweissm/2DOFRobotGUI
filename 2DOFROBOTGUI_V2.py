@@ -64,7 +64,7 @@ def plot(x_coord, y_coord, theta, L1, L2):
     plot1.grid()
 
     #plotting work space
-    x, y = generate_semicircle(0, 0 , np.sqrt(L1**2+L2**2), 0.01)
+    x, y = generate_semicircle(0, 0, np.sqrt(L1**2+L2**2), 0.01)
     plot1.plot(x, y, color='black', linestyle='dashed')
     plot1.plot(-x, y, color='black', linestyle='dashed')
 
@@ -102,7 +102,7 @@ def startupPlot(L1, L2):
     plot1.grid()
 
     # plotting work space
-    x, y = generate_semicircle(0, 0 , np.sqrt(L1**2+L2**2), 0.01)
+    x, y = generate_semicircle(0, 0, np.sqrt(L1**2+L2**2), 0.01)
     plot1.plot(x, y, color='black', linestyle='dashed')
     plot1.plot(-x, y, color='black', linestyle='dashed')
 
@@ -131,7 +131,6 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
     """
     generates coordinates for a semicircle, centered at center_x, center_y
     """
-
     x = np.arange(center_x, center_x+radius+stepsize, stepsize)
     y = np.sqrt(radius**2 - x**2)
 
@@ -182,8 +181,8 @@ def func(angles, x, y, L1, L2):
 
 #set path defaults
 ActivePath=0;
-pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
-pathY = [-5, -5, -5, -5, -5,   -5,   -5,  -2,   1,   4,   7 , 10, 10,   10,  10, 10, 10, 10,  7,  4,  1, -2, -5]
+pathX = [5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5, -3, -1, 1, 3, 5]
+pathY = [-5, -3, -1, 1, 3, 5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5]
 def ChangeSelectPathButton():
     global ActivePath
     global pathX
@@ -200,26 +199,26 @@ def ChangeSelectPathButton():
 
     match ActivePath:
         case 0: #rectangle
-            pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
-            pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
+            pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
+            pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
         case 1: #involute of circle
             u = np.linspace(0, 3 * np.pi, 50)
             c = .75
-            pathX = (c * (np.cos(u) + u * np.sin(u))) - 10
+            pathX = (c * (np.cos(u) + u * np.sin(u)))
             pathY = c * (np.sin(u) - u * np.cos(u))
         case 2:  # Heart
             u = np.linspace(0,  2 * np.pi, 50)
             c = .3
-            pathX = (6*c*np.sin(u))**3 - 10
+            pathX = (6*c*np.sin(u))**3
             pathY = 13*c*np.cos(u)-5*c*np.cos(2*u)-2*c*np.cos(3*u)-c*np.cos(4*u)
         case 3:  # lemniscate
             u = np.linspace(0, 2 * np.pi, 50)
             c = 5
-            pathX = (c * np.cos(u)) - 10
+            pathX = (c * np.cos(u))
             pathY = c * np.sin(2 * u)
         case default: #rectangle
-            pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
-            pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
+            pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
+            pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
 
     startupPlot(L1, L2)
 
