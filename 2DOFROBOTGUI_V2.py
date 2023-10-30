@@ -202,8 +202,8 @@ def ChangeSelectPathButton():
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
             pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
         case 1: #involute of circle
-            u = np.linspace(0, 3 * np.pi, 50)
-            c = .75
+            u = np.linspace(0, 6.5 * np.pi, 80)
+            c = .45
             pathX = (c * (np.cos(u) + u * np.sin(u)))
             pathY = c * (np.sin(u) - u * np.cos(u))
         case 2:  # Heart
