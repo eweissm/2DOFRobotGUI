@@ -11,7 +11,8 @@ import scipy.optimize
 L1 = 10
 L2 = 10
 # calculate the angles using inverse kinematics
-theta0 = [np.pi/2,np.pi/2]
+theta0 = [np.pi/2, np.pi/2]
+
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
@@ -20,23 +21,23 @@ def calculate_angles(x, y, L1, L2):
     counter=0
     ErrorFlag= True
 
-    while(ErrorFlag and counter<3):
+    while(ErrorFlag and counter<5):
 
-        solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
+        solution,infodict, ier, msg =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))), full_output=1)
 
         #normalize angles
         solution[0] = NormalizeAngle(solution[0])
         solution[1] = NormalizeAngle(solution[1])
 
-        if solution[0] > np.pi or solution[0] < 0 or solution[1] > np.pi or solution[1] < 0:
-            counter = counter+1
+        if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1:
+            counter = counter + 1
             rng = np.random.default_rng(12345)
             rFloat = np.pi*(rng.random(2)-.5)
             theta0= [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
         else:
             ErrorFlag = False
 
-        print(theta0)
+        #print(theta0)
 
     if ErrorFlag:
         print("Error: Angles out of bounds")
@@ -119,11 +120,14 @@ def startupPlot(L1, L2):
 #normalize angle between 0 and 2*pi
 def NormalizeAngle(angle):
     if angle > 2*np.pi:
-        solution = angle- ((angle % 2*np.pi) * 2*np.pi)
+        solution = angle - abs(np.floor(angle / (2*np.pi)) * 2 * np.pi)
+        print("angle > 2pi")
     elif angle < 0:
-        solution = angle + ((angle % 2 * np.pi) * 2 * np.pi)
+        solution = angle + abs(np.floor(angle / (2*np.pi)) * 2 * np.pi)
+        print("angle < 2pi")
     else:
         solution = angle
+        print("angle did not need to be normalized")
 
     return solution
 
@@ -171,10 +175,10 @@ def set_coordinates_state(x_coord, y_coord):
         theta1_deg = int(theta[0] * 180 / np.pi)
         theta2_deg = int(theta[1] * 180 / np.pi)
         #send serial data to arduino
-        ser.write(bytes( str(theta1_deg), 'UTF-8'))
-        ser.write(bytes('A', 'UTF-8'))
-        ser.write(bytes( str(theta2_deg), 'UTF-8'))
-        ser.write(bytes('B', 'UTF-8'))
+        #ser.write(bytes( str(theta1_deg), 'UTF-8'))
+        #ser.write(bytes('A', 'UTF-8'))
+        #ser.write(bytes( str(theta2_deg), 'UTF-8'))
+        #ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
