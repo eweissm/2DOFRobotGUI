@@ -170,10 +170,10 @@ def set_coordinates_state(x_coord, y_coord):
         theta1_deg = int(theta[0] * 180 / np.pi)
         theta2_deg = int(theta[1] * 180 / np.pi)
         #send serial data to arduino
-        #ser.write(bytes( str(theta1_deg), 'UTF-8'))
-        #ser.write(bytes('A', 'UTF-8'))
-        #ser.write(bytes( str(theta2_deg), 'UTF-8'))
-        #ser.write(bytes('B', 'UTF-8'))
+        ser.write(bytes( str(theta1_deg), 'UTF-8'))
+        ser.write(bytes('A', 'UTF-8'))
+        ser.write(bytes( str(theta2_deg-90), 'UTF-8'))
+        ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
@@ -223,7 +223,7 @@ def ChangeSelectPathButton():
     startupPlot(L1, L2)
 
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
-#ser = serial.Serial('com4', 9600) #create Serial Object
+ser = serial.Serial('com4', 9600) #create Serial Object
 time.sleep(3) #delay 3 seconds to allow serial com to get established
 
 # Build GUI------------------------------------------------------------------------------------------------------------------------------------------------------------
