@@ -26,7 +26,7 @@ def calculate_angles(x, y, L1, L2):
         solution,infodict, ier, msg =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))), full_output=1)
 
         #normalize angles
-        solution[0] = NormalizeAngle(solution[0])
+        #solution[0] = NormalizeAngle(solution[0])
         solution[1] = NormalizeAngle(solution[1])
 
         if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1:
@@ -149,7 +149,7 @@ def StartPathFollow():
 
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
-        time.sleep(.1)
+        time.sleep(.5)
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
@@ -202,7 +202,7 @@ def ChangeSelectPathButton():
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
             pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
         case 1: #involute of circle
-            u = np.linspace(0, 6.5 * np.pi, 80)
+            u = np.linspace(0, 6.5 * np.pi, 150)
             c = .45
             pathX = (c * (np.cos(u) + u * np.sin(u)))
             pathY = c * (np.sin(u) - u * np.cos(u))
