@@ -11,7 +11,8 @@ import scipy.optimize
 L1 = 10
 L2 = 10
 # calculate the angles using inverse kinematics
-theta0 = [np.pi/2,np.pi/2]
+theta0 = [np.pi/2, np.pi/2]
+
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
@@ -20,23 +21,23 @@ def calculate_angles(x, y, L1, L2):
     counter=0
     ErrorFlag= True
 
-    while(ErrorFlag and counter<3):
+    while(ErrorFlag and counter<5):
 
-        solution =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))))
+        solution,infodict, ier, msg =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))), full_output=1)
 
         #normalize angles
-        solution[0] = NormalizeAngle(solution[0])
+        #solution[0] = NormalizeAngle(solution[0])
         solution[1] = NormalizeAngle(solution[1])
 
-        if solution[0] > np.pi or solution[0] < 0 or solution[1] > np.pi or solution[1] < 0:
-            counter = counter+1
+        if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1:
+            counter = counter + 1
             rng = np.random.default_rng(12345)
             rFloat = np.pi*(rng.random(2)-.5)
             theta0= [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
         else:
             ErrorFlag = False
 
-        print(theta0)
+        #print(theta0)
 
     if ErrorFlag:
         print("Error: Angles out of bounds")
@@ -63,11 +64,10 @@ def plot(x_coord, y_coord, theta, L1, L2):
     plot1.grid()
 
     #plotting work space
-    x, y = generate_semicircle(0, 0 , L2, 0.1)
-    plot1.plot(y-L1, -x, color='black', linestyle='dashed')
-    plot1.plot(y + L1, x, color='black', linestyle='dashed')
-    x, y = generate_semicircle(0, 0, L2+L1, 0.1)
-    plot1.plot(y , x, color='black', linestyle='dashed')
+    x, y = generate_semicircle(0, 0, np.sqrt(L1**2+L2**2), 0.01)
+    plot1.plot(x, y, color='black', linestyle='dashed')
+    plot1.plot(-x, y, color='black', linestyle='dashed')
+
 
     #plotting path
     plot1.plot(pathX, pathY, color='blue', linestyle='dashed')
@@ -102,11 +102,9 @@ def startupPlot(L1, L2):
     plot1.grid()
 
     # plotting work space
-    x, y = generate_semicircle(0, 0, L2, 0.1)
-    plot1.plot(y - L1, -x, color='black', linestyle='dashed')
-    plot1.plot(y + L1, x, color='black', linestyle='dashed')
-    x, y = generate_semicircle(0, 0, L2 + L1, 0.1)
-    plot1.plot(y, x, color='black', linestyle='dashed')
+    x, y = generate_semicircle(0, 0, np.sqrt(L1**2+L2**2), 0.01)
+    plot1.plot(x, y, color='black', linestyle='dashed')
+    plot1.plot(-x, y, color='black', linestyle='dashed')
 
     # plotting path
     plot1.plot(pathX, pathY, color='blue', linestyle='dashed')
@@ -127,14 +125,12 @@ def NormalizeAngle(angle):
         solution = angle + abs(np.floor(angle / (2*np.pi)) * 2 * np.pi)
     else:
         solution = angle
-
     return solution
 
 def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
     """
     generates coordinates for a semicircle, centered at center_x, center_y
     """
-
     x = np.arange(center_x, center_x+radius+stepsize, stepsize)
     y = np.sqrt(radius**2 - x**2)
 
@@ -153,7 +149,7 @@ def StartPathFollow():
 
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
-        time.sleep(.1)
+        time.sleep(.5)
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
@@ -176,7 +172,7 @@ def set_coordinates_state(x_coord, y_coord):
         #send serial data to arduino
         ser.write(bytes( str(theta1_deg), 'UTF-8'))
         ser.write(bytes('A', 'UTF-8'))
-        ser.write(bytes( str(theta2_deg), 'UTF-8'))
+        ser.write(bytes( str(theta2_deg-90), 'UTF-8'))
         ser.write(bytes('B', 'UTF-8'))
 
 def func(angles, x, y, L1, L2):
@@ -185,8 +181,8 @@ def func(angles, x, y, L1, L2):
 
 #set path defaults
 ActivePath=0;
-pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
-pathY = [-5, -5, -5, -5, -5,   -5,   -5,  -2,   1,   4,   7 , 10, 10,   10,  10, 10, 10, 10,  7,  4,  1, -2, -5]
+pathX = [5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5, -3, -1, 1, 3, 5]
+pathY = [-5, -3, -1, 1, 3, 5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5]
 def ChangeSelectPathButton():
     global ActivePath
     global pathX
@@ -203,26 +199,26 @@ def ChangeSelectPathButton():
 
     match ActivePath:
         case 0: #rectangle
-            pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
-            pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
+            pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
+            pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
         case 1: #involute of circle
-            u = np.linspace(0, 3 * np.pi, 50)
-            c = .75
-            pathX = (c * (np.cos(u) + u * np.sin(u))) - 10
+            u = np.linspace(0, 6.5 * np.pi, 150)
+            c = .45
+            pathX = (c * (np.cos(u) + u * np.sin(u)))
             pathY = c * (np.sin(u) - u * np.cos(u))
         case 2:  # Heart
-            u = np.linspace(0,  2 * np.pi, 50)
+            u = np.linspace(0,  2 * np.pi, 100)
             c = .3
-            pathX = (6*c*np.sin(u))**3 - 10
+            pathX = (6*c*np.sin(u))**3
             pathY = 13*c*np.cos(u)-5*c*np.cos(2*u)-2*c*np.cos(3*u)-c*np.cos(4*u)
         case 3:  # lemniscate
             u = np.linspace(0, 2 * np.pi, 50)
             c = 5
-            pathX = (c * np.cos(u)) - 10
+            pathX = (c * np.cos(u))
             pathY = c * np.sin(2 * u)
         case default: #rectangle
-            pathX = [-5, -7, -9, -11, -13, -15, -15, -15, -15, -15, -15, -15, -15, -13, -11, -9, -7, -5, -5, -5, -5, -5, -5]
-            pathY = [-5, -5, -5, -5, -5, -5, -5, -2, 1, 4, 7, 10, 10, 10, 10, 10, 10, 10, 7, 4, 1, -2, -5]
+            pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
+            pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
 
     startupPlot(L1, L2)
 
