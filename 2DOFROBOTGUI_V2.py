@@ -207,7 +207,7 @@ def ChangeSelectPathButton():
             pathX = (c * (np.cos(u) + u * np.sin(u)))
             pathY = c * (np.sin(u) - u * np.cos(u))
         case 2:  # Heart
-            u = np.linspace(0,  2 * np.pi, 50)
+            u = np.linspace(0,  2 * np.pi, 100)
             c = .3
             pathX = (6*c*np.sin(u))**3
             pathY = 13*c*np.cos(u)-5*c*np.cos(2*u)-2*c*np.cos(3*u)-c*np.cos(4*u)
