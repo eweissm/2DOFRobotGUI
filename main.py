@@ -185,8 +185,12 @@ def set_coordinates_state(x_coord, y_coord):
         ser.write(bytes('B', 'UTF-8'))
 
         # get expected move time from arduino
-        ExpectedTime = ser.readline()
-        print("ExpectedTime: "+ExpectedTime)
+        ExpectedTime_bytes = ser.readline()
+        ExpectedTime_string = ExpectedTime_bytes.decode("utf-8")
+        print("ExpectedTime: " + ExpectedTime_string)
+
+        ExpectedTime =float(ExpectedTime_string+.5)
+
         ser.reset_input_buffer()  # clear input buffer
 
         # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
@@ -203,7 +207,7 @@ def set_coordinates_state(x_coord, y_coord):
                 ArduinoMessage = ser.read(1) #read one bit from buffer
                 print(ArduinoMessage)
 
-            if ArduinoMessage == 'y':
+            if ArduinoMessage == b'y':
                 DidMoveWork = True
                 print("Move was successful")
             else:
