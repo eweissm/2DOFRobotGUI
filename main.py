@@ -146,26 +146,10 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
 def StartPathFollow():
     global pathX
     global pathY
-    CheckSerialCounter = 5 # how many times we will check the serial before giving up
-
 
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
 
-        # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
-        # After which, if we still do not have confirmation, we will print to the monitor that there was a problem and
-        # move on
-        DidMoveWork = False
-        counter = 0
-        while counter < CheckSerialCounter and not DidMoveWork:
-            if ser.inWaiting():
-                #TODO: if the 'y' is received, update didmovework
-                DidMoveWork = True
-            else:
-                time.sleep(.5)
-
-        if not DidMoveWork:
-            print("Move was not successful")
 
 
 
@@ -180,19 +164,60 @@ def set_coordinates_state(x_coord, y_coord):
     L1 = 10
     L2 = 10
 
+    ser.reset_input_buffer()  # clear input buffer
+
+    CheckSerialCounter = 3  # how many times we will check the serial before giving up
+
     #perform inverse Kinematics calculation
     theta = calculate_angles(x_coord, y_coord, L1, L2)
     if not ErrorFlag:
         print(theta * 180 / np.pi)
+
         #generate and plot the graph
         plot(x_coord, y_coord, theta, L1, L2)
         theta1_deg = int(theta[0] * 180 / np.pi)
         theta2_deg = int(theta[1] * 180 / np.pi)
+
         #send serial data to arduino
         ser.write(bytes( str(theta1_deg), 'UTF-8'))
         ser.write(bytes('A', 'UTF-8'))
         ser.write(bytes( str(theta2_deg-90), 'UTF-8'))
         ser.write(bytes('B', 'UTF-8'))
+
+        # get expected move time from arduino
+        ExpectedTime = ser.readline()
+        print("ExpectedTime: "+ExpectedTime)
+        ser.reset_input_buffer()  # clear input buffer
+
+        # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
+        # After which, if we still do not have confirmation, we will print to the monitor that there was a problem and
+        # move on
+        DidMoveWork = False
+        counter = 0
+        ArduinoMessage = ''
+
+        time.sleep(ExpectedTime) #wait for move to complete
+
+        while counter < CheckSerialCounter and not DidMoveWork:
+            if ser.inWaiting():
+                ArduinoMessage = ser.read(1) #read one bit from buffer
+                print(ArduinoMessage)
+
+            if ArduinoMessage == 'y':
+                DidMoveWork = True
+                print("Move was successful")
+            else:
+                print("Waiting...")
+                time.sleep(ExpectedTime)
+                counter = counter + 1
+
+
+        if not DidMoveWork:
+            print("Move was not successful")
+
+        ser.reset_input_buffer() #clear input buffer
+
+
 
 def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
