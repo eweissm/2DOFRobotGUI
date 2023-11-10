@@ -189,7 +189,8 @@ def set_coordinates_state(x_coord, y_coord):
         ExpectedTime_string = ExpectedTime_bytes.decode("utf-8")
         print("ExpectedTime: " + ExpectedTime_string)
 
-        ExpectedTime =float(ExpectedTime_string) # convert expected time to float
+        ExpectedTime = max(float(ExpectedTime_string), 0.005) # convert expected time to float (minimum time is 0.005s)
+
 
         ser.reset_input_buffer()  # clear input buffer
 
