@@ -11,8 +11,8 @@ import scipy.optimize
 L1 = 10
 L2 = 10
 # calculate the angles using inverse kinematics
-theta0 = [np.pi/2, np.pi/2]
-
+#theta0 = [np.pi/2, np.pi/2]
+theta0 = [0, 0]
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
@@ -146,10 +146,29 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
 def StartPathFollow():
     global pathX
     global pathY
+    CheckSerialCounter = 5 # how many times we will check the serial before giving up
+
 
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
-        time.sleep(.5)
+
+        # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
+        # After which, if we still do not have confirmation, we will print to the monitor that there was a problem and
+        # move on
+        DidMoveWork = False
+        counter = 0
+        while counter < CheckSerialCounter and not DidMoveWork:
+            if ser.inWaiting():
+                #TODO: if the 'y' is received, update didmovework
+                DidMoveWork = True
+            else:
+                time.sleep(.5)
+
+        if not DidMoveWork:
+            print("Move was not successful")
+
+
+
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
@@ -223,7 +242,7 @@ def ChangeSelectPathButton():
     startupPlot(L1, L2)
 
 #set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
-ser = serial.Serial('com4', 9600) #create Serial Object
+ser = serial.Serial('com4', 9600, timeout=10) #create Serial Object, baud = 9600, read times out after 10s
 time.sleep(3) #delay 3 seconds to allow serial com to get established
 
 # Build GUI------------------------------------------------------------------------------------------------------------------------------------------------------------
