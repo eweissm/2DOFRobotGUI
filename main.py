@@ -191,7 +191,6 @@ def set_coordinates_state(x_coord, y_coord):
 
         ExpectedTime = max(float(ExpectedTime_string), 0.005) # convert expected time to float (minimum time is 0.005s)
 
-
         ser.reset_input_buffer()  # clear input buffer
 
         # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
@@ -201,11 +200,11 @@ def set_coordinates_state(x_coord, y_coord):
         counter = 0
         ArduinoMessage = ''
 
-        time.sleep(ExpectedTime+.01) #wait for move to complete
+        time.sleep(ExpectedTime+.01) # wait for move to complete
 
         while counter < CheckSerialCounter and not DidMoveWork:
             if ser.inWaiting():
-                ArduinoMessage = ser.read(1) #read one bit from buffer
+                ArduinoMessage = ser.read(1) # read one bit from buffer
                 print(ArduinoMessage)
 
             if ArduinoMessage == b'y':
