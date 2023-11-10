@@ -189,7 +189,7 @@ def set_coordinates_state(x_coord, y_coord):
         ExpectedTime_string = ExpectedTime_bytes.decode("utf-8")
         print("ExpectedTime: " + ExpectedTime_string)
 
-        ExpectedTime =float(ExpectedTime_string+.5)
+        ExpectedTime =float(ExpectedTime_string) # convert expected time to float
 
         ser.reset_input_buffer()  # clear input buffer
 
@@ -200,7 +200,7 @@ def set_coordinates_state(x_coord, y_coord):
         counter = 0
         ArduinoMessage = ''
 
-        time.sleep(ExpectedTime) #wait for move to complete
+        time.sleep(ExpectedTime+.01) #wait for move to complete
 
         while counter < CheckSerialCounter and not DidMoveWork:
             if ser.inWaiting():
@@ -212,7 +212,7 @@ def set_coordinates_state(x_coord, y_coord):
                 print("Move was successful")
             else:
                 print("Waiting...")
-                time.sleep(ExpectedTime)
+                time.sleep(ExpectedTime/2 +.01)
                 counter = counter + 1
 
 
