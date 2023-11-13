@@ -150,10 +150,6 @@ def StartPathFollow():
     for i in range(len(pathX)):
         set_coordinates_state(pathX[i], pathY[i])
 
-
-
-
-
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
     global theta #angles of joints 1 and 2
@@ -171,7 +167,7 @@ def set_coordinates_state(x_coord, y_coord):
     #perform inverse Kinematics calculation
     theta = calculate_angles(x_coord, y_coord, L1, L2)
     if not ErrorFlag:
-        print(theta * 180 / np.pi)
+        #print(theta * 180 / np.pi)
 
         #generate and plot the graph
         plot(x_coord, y_coord, theta, L1, L2)
@@ -189,7 +185,7 @@ def set_coordinates_state(x_coord, y_coord):
         ExpectedTime_string = ExpectedTime_bytes.decode("utf-8")
         print("ExpectedTime: " + ExpectedTime_string)
 
-        ExpectedTime = max(float(ExpectedTime_string), 0.005) # convert expected time to float (minimum time is 0.005s)
+        ExpectedTime = max(float(ExpectedTime_string), 0.005)  # convert expected time to float (minimum time is 0.005s)
 
         ser.reset_input_buffer()  # clear input buffer
 
@@ -200,11 +196,11 @@ def set_coordinates_state(x_coord, y_coord):
         counter = 0
         ArduinoMessage = ''
 
-        time.sleep(ExpectedTime+.01) # wait for move to complete
+        time.sleep(ExpectedTime + 0.01)  # wait for move to complete
 
         while counter < CheckSerialCounter and not DidMoveWork:
             if ser.inWaiting():
-                ArduinoMessage = ser.read(1) # read one bit from buffer
+                ArduinoMessage = ser.read(1)  # read one bit from buffer
                 print(ArduinoMessage)
 
             if ArduinoMessage == b'y':
@@ -212,7 +208,7 @@ def set_coordinates_state(x_coord, y_coord):
                 print("Move was successful")
             else:
                 print("Waiting...")
-                time.sleep(ExpectedTime/2 +.01)
+                time.sleep(ExpectedTime/2 + 0.01)
                 counter = counter + 1
 
 
@@ -220,8 +216,6 @@ def set_coordinates_state(x_coord, y_coord):
             print("Move was not successful")
 
         ser.reset_input_buffer() #clear input buffer
-
-
 
 def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
