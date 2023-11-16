@@ -13,10 +13,12 @@ L2 = 10
 # calculate the angles using inverse kinematics
 #theta0 = [np.pi/2, np.pi/2]
 theta0 = [0, 0]
+prevTheta1 = 0
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
     global counter
+    global prevTheta1 # previous solution to theta1
 
     counter=0
     ErrorFlag= True
@@ -29,13 +31,14 @@ def calculate_angles(x, y, L1, L2):
         #solution[0] = NormalizeAngle(solution[0])
         solution[1] = NormalizeAngle(solution[1])
 
-        if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1:
+        if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1 or abs(solution[0]-prevTheta1) > 2*np.pi:
             counter = counter + 1
             rng = np.random.default_rng(12345)
             rFloat = np.pi*(rng.random(2)-.5)
             theta0= [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
         else:
             ErrorFlag = False
+            prevTheta1 = solution[0]
 
         #print(theta0)
 
@@ -167,7 +170,7 @@ def set_coordinates_state(x_coord, y_coord):
     #perform inverse Kinematics calculation
     theta = calculate_angles(x_coord, y_coord, L1, L2)
     if not ErrorFlag:
-        #print(theta * 180 / np.pi)
+        print(theta * 180 / np.pi)
 
         #generate and plot the graph
         plot(x_coord, y_coord, theta, L1, L2)
@@ -196,7 +199,7 @@ def set_coordinates_state(x_coord, y_coord):
         counter = 0
         ArduinoMessage = ''
 
-        time.sleep(ExpectedTime + 0.01)  # wait for move to complete
+        time.sleep(ExpectedTime+.005)  # wait for move to complete
 
         while counter < CheckSerialCounter and not DidMoveWork:
             if ser.inWaiting():
@@ -208,7 +211,7 @@ def set_coordinates_state(x_coord, y_coord):
                 print("Move was successful")
             else:
                 print("Waiting...")
-                time.sleep(ExpectedTime/2 + 0.01)
+                time.sleep(ExpectedTime/2+.005)
                 counter = counter + 1
 
 
@@ -232,7 +235,7 @@ def ChangeSelectPathButton():
     global L1
     global L2
 
-    numCases = 4
+    numCases = 5
 
     if ActivePath >= numCases-1:
         ActivePath=0
@@ -258,6 +261,10 @@ def ChangeSelectPathButton():
             c = 5
             pathX = (c * np.cos(u))
             pathY = c * np.sin(2 * u)
+        case 4:  # Lisajous curves
+            u = np.linspace(0, 15 * np.pi, 400)
+            pathX = (9 * np.sin(u*.9))
+            pathY = 9 * np.sin(u)
         case default: #rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
             pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
