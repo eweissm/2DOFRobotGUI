@@ -177,8 +177,11 @@ def set_coordinates_state(x_coord, y_coord):
     CheckSerialCounter = 3  # how many times we will check the serial before giving up
 
     #Pre-Calculate inverse Kinematics calculation
+
+    print("Calculating Angles...")
     for i in range(NumEntries):
         if NumEntries > 1:
+
             thisXCoord = x_coord[i]
             thisYCoord = y_coord[i]
         else:
@@ -198,6 +201,8 @@ def set_coordinates_state(x_coord, y_coord):
             print("Failed to Calculate Coordinate: "+str(i))
             break
 
+    print("Done Calculating Angles")
+
     # Run through the angles
     if not ErrorFlag:
         for i in range(NumEntries):
@@ -215,7 +220,10 @@ def set_coordinates_state(x_coord, y_coord):
             ExpectedTime_string = ExpectedTime_bytes.decode("utf-8")
             print("ExpectedTime: " + ExpectedTime_string)
 
-            ExpectedTime = max(float(ExpectedTime_string), 0.005)  # convert expected time to float (minimum time is 0.005s)
+            try:
+                ExpectedTime = max(float(ExpectedTime_string), 0.1)  # convert expected time to float (minimum time is 0.005s)
+            except ValueError:
+                ExpectedTime = 0.1
 
             ser.reset_input_buffer()  # clear input buffer
 
@@ -292,8 +300,8 @@ def ChangeSelectPathButton():
             pathY = c * np.sin(2 * u)
         case 4:  # Lisajous curves
             u = np.linspace(0, 15 * np.pi, 400)
-            pathX = (9 * np.sin(u*.9))
-            pathY = 9 * np.sin(u)
+            pathX = (8 * np.sin(u*.9))
+            pathY = 8 * np.sin(u)
         case default: #rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
             pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
