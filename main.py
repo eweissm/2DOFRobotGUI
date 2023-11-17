@@ -20,6 +20,7 @@ def calculate_angles(x, y, L1, L2):
     global counter
     global prevTheta1 # previous solution to theta1
 
+    start = time.time()
     counter=0
     ErrorFlag= True
 
@@ -48,6 +49,8 @@ def calculate_angles(x, y, L1, L2):
     else:
         theta0 = solution
 
+    end = time.time()
+    print("Time to Determine Angles: " + str(end-start))
     return solution
 
 #generate and plot the graph
@@ -155,6 +158,8 @@ def StartPathFollow():
 
 #when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
 def set_coordinates_state(x_coord, y_coord):
+
+
     global theta #angles of joints 1 and 2
     global L1
     global L2
@@ -177,6 +182,8 @@ def set_coordinates_state(x_coord, y_coord):
         theta1_deg = int(theta[0] * 180 / np.pi)
         theta2_deg = int(theta[1] * 180 / np.pi)
 
+        start = time.time()
+
         #send serial data to arduino
         ser.write(bytes( str(theta1_deg), 'UTF-8'))
         ser.write(bytes('A', 'UTF-8'))
@@ -192,6 +199,9 @@ def set_coordinates_state(x_coord, y_coord):
 
         ser.reset_input_buffer()  # clear input buffer
 
+        end = time.time()
+        print("Time to Communicate With Arduino: " + str(end - start))
+
         # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
         # After which, if we still do not have confirmation, we will print to the monitor that there was a problem and
         # move on
@@ -199,7 +209,7 @@ def set_coordinates_state(x_coord, y_coord):
         counter = 0
         ArduinoMessage = ''
 
-        time.sleep(ExpectedTime+.005)  # wait for move to complete
+        time.sleep(ExpectedTime)  # wait for move to complete
 
         while counter < CheckSerialCounter and not DidMoveWork:
             if ser.inWaiting():
@@ -211,7 +221,7 @@ def set_coordinates_state(x_coord, y_coord):
                 print("Move was successful")
             else:
                 print("Waiting...")
-                time.sleep(ExpectedTime/2+.005)
+                time.sleep(ExpectedTime/2)
                 counter = counter + 1
 
 
@@ -225,7 +235,7 @@ def func(angles, x, y, L1, L2):
     #return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 + (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
 
 #set path defaults
-ActivePath=0;
+ActivePath = 0
 pathX = [5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5, -3, -1, 1, 3, 5]
 pathY = [-5, -3, -1, 1, 3, 5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5]
 def ChangeSelectPathButton():
