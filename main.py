@@ -135,7 +135,8 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
     generates coordinates for a semicircle, centered at center_x, center_y
     """
     x = np.arange(center_x, center_x+radius+stepsize, stepsize)
-    y = np.sqrt(radius**2 - x**2)
+
+    y = np.sqrt(abs(radius**2 - x**2))
 
     # since each x value has two corresponding y-values, duplicate x-axis.
     # [::-1] is required to have the correct order of elements for plt.plot.
