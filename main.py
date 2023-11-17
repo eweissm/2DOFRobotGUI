@@ -11,36 +11,37 @@ import progressbar
 L1 = 10
 L2 = 10
 # calculate the angles using inverse kinematics
-#theta0 = [np.pi/2, np.pi/2]
 theta0 = [0, 0]
 prevTheta1 = 0
+
+
 def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
     global counter
     global prevTheta1 # previous solution to theta1
 
-    counter=0
-    ErrorFlag= True
+    counter = 0
+    ErrorFlag = True
 
-    while(ErrorFlag and counter<5):
+    while ErrorFlag and counter<5:
 
         solution,infodict, ier, msg =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))), full_output=1)
 
         #normalize angles
-        #solution[0] = NormalizeAngle(solution[0])
         solution[1] = NormalizeAngle(solution[1])
 
         if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1 or abs(solution[0]-prevTheta1) > 2*np.pi:
+
             counter = counter + 1
             rng = np.random.default_rng(12345)
             rFloat = np.pi*(rng.random(2)-.5)
-            theta0= [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
+            theta0 = [theta0[0]+rFloat[0], theta0[1]+rFloat[1]]
+
         else:
             ErrorFlag = False
             prevTheta1 = solution[0]
 
-        #print(theta0)
 
     if ErrorFlag:
         print("Error: Angles out of bounds")
@@ -50,7 +51,8 @@ def calculate_angles(x, y, L1, L2):
 
     return solution
 
-#generate and plot the graph
+
+# generate and plot the graph
 def plot(x_coord, y_coord, theta, L1, L2):
     global pathX
     global pathY
@@ -61,18 +63,18 @@ def plot(x_coord, y_coord, theta, L1, L2):
     # adding the subplot
     plot1 = fig.add_subplot(111)
 
-    #set limits for graphs
+    # set limits for graphs
     plot1.set_xlim([-(L1+L2+2), (L1+L2+2)])
     plot1.set_ylim([-(L1+L2+2), (L1+L2+2)])
     plot1.grid()
 
-    #plotting work space
+    # plotting work space
     x, y = generate_semicircle(0, 0, np.sqrt(L1**2+L2**2), 0.01)
     plot1.plot(x, y, color='black', linestyle='dashed')
     plot1.plot(-x, y, color='black', linestyle='dashed')
 
 
-    #plotting path
+    # plotting path
     plot1.plot(pathX, pathY, color='blue', linestyle='dashed')
 
     # plotting the arm
