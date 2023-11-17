@@ -6,7 +6,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 from matplotlib import pyplot as plt
 import numpy as np
 import scipy.optimize
-
+import progressbar
 
 L1 = 10
 L2 = 10
@@ -177,29 +177,31 @@ def set_coordinates_state(x_coord, y_coord):
     CheckSerialCounter = 3  # how many times we will check the serial before giving up
 
     #Pre-Calculate inverse Kinematics calculation
-
     print("Calculating Angles...")
-    for i in range(NumEntries):
-        if NumEntries > 1:
+    with progressbar.ProgressBar(max_value=NumEntries) as bar:
+        for i in range(NumEntries):
+            if NumEntries > 1:
 
-            thisXCoord = x_coord[i]
-            thisYCoord = y_coord[i]
-        else:
-            thisXCoord = x_coord
-            thisYCoord = y_coord
+                thisXCoord = x_coord[i]
+                thisYCoord = y_coord[i]
+            else:
+                thisXCoord = x_coord
+                thisYCoord = y_coord
 
 
-        theta = calculate_angles(thisXCoord, thisYCoord, L1, L2)
-        if not ErrorFlag:
-            #print(theta * 180 / np.pi)
+            theta = calculate_angles(thisXCoord, thisYCoord, L1, L2)
+            if not ErrorFlag:
+                #print(theta * 180 / np.pi)
 
-            #generate and plot the graph
-            plot(thisXCoord, thisYCoord, theta, L1, L2)
-            theta1_deg[i] = int(theta[0] * 180 / np.pi)
-            theta2_deg[i] = int(theta[1] * 180 / np.pi)
-        else:
-            print("Failed to Calculate Coordinate: "+str(i))
-            break
+                #generate and plot the graph
+                plot(thisXCoord, thisYCoord, theta, L1, L2)
+                theta1_deg[i] = int(theta[0] * 180 / np.pi)
+                theta2_deg[i] = int(theta[1] * 180 / np.pi)
+            else:
+                print("Failed to Calculate Coordinate: "+str(i))
+                break
+
+            bar.update(i)
 
     print("Done Calculating Angles")
 
