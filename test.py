@@ -1,22 +1,47 @@
 import re
+fileName = r"C:\Users\Ericw\Desktop\TopScience.gc"
+#def GcodeConverter(fileName):
 
-FileName = r"C:\Users\Ericw\Desktop\TopScience2.txt"
+x = []
+y = []
 
-x=[]
-y=[]
+prevFullLine = 0
 
-with open(FileName,"r", encoding='utf-8-sig') as f:
+with open(fileName, "r", encoding='utf-8-sig') as f:
     lines = f.read()
     lines2 = lines.splitlines()
 
     for line in lines2:
-        result = (re.search(r"X([\S]+) Y([\S]+)", line)).groups()
+        match = re.search(r"X(\S*) Y(\S*)|X(\S*)| Y(\S*)", line)
 
-        x_temp = result[0]
-        y_temp = (result[1])
+        if match != None:  # if we find a match
+            result = match.groups()
 
-        x.append(float(x_temp))
-        y.append(float(y_temp))
+            prevFullLine = prevFullLine + 1
 
-print(*zip(x,y))
+            if result[0] != None:
+                x_temp = result[0]
+                y_temp = (result[1])
 
+                x.append(float(x_temp))
+                y.append(float(y_temp))
+            elif result[2] != None:
+                x_temp = result[2]
+                y_temp = y[len(y)-1] # get last input
+
+                x.append(float(x_temp))
+                y.append(float(y_temp))
+            elif result[3] != None:
+                y_temp = result[3]
+                x_temp = x[len(x) - 1]  # get last input
+
+                x.append(float(x_temp))
+                y.append(float(x_temp))
+
+print(len(x))
+
+
+
+    #return x, y
+
+#print(GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience2.txt"))
