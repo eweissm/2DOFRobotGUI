@@ -280,13 +280,14 @@ def set_coordinates_state(x_coord, y_coord):
             # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
             # After which, if we still do not have confirmation, we will print to the monitor that there was a problem
             # and move on
+
             DidMoveWork = False
-            counter = 0
+
             ArduinoMessage = ''
 
-            time.sleep(ExpectedTime)  # wait for move to complete
+            MoveStartTime = time.time()
 
-            while counter < CheckSerialCounter and not DidMoveWork:
+            while time.time()-MoveStartTime < ExpectedTime*4 and not DidMoveWork:
                 if ser.inWaiting():
                     ArduinoMessage = ser.read(1)  # read one bit from buffer
                     print(ArduinoMessage)
@@ -294,10 +295,6 @@ def set_coordinates_state(x_coord, y_coord):
                 if ArduinoMessage == b'y':
                     DidMoveWork = True
                     print("Move was successful")
-                else:
-                    print("Waiting...")
-                    time.sleep(ExpectedTime/2)
-                    counter = counter + 1
 
             if not DidMoveWork:
                 print("Move was not successful")
