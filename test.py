@@ -4,20 +4,16 @@ fileName = r"C:\Users\Ericw\Desktop\TopScience.gc"
 
 x = []
 y = []
-
-prevFullLine = 0
-
+counter = 0
 with open(fileName, "r", encoding='utf-8-sig') as f:
     lines = f.read()
     lines2 = lines.splitlines()
 
     for line in lines2:
-        match = re.search(r"X(\S*) Y(\S*)|X(\S*)| Y(\S*)", line)
+        match = re.search(r"G1 X(\S*) Y(\S*)|G1 X(\S*)|G1  Y(\S*)", line)
 
         if match != None:  # if we find a match
             result = match.groups()
-
-            prevFullLine = prevFullLine + 1
 
             if result[0] != None:
                 x_temp = result[0]
@@ -31,6 +27,7 @@ with open(fileName, "r", encoding='utf-8-sig') as f:
 
                 x.append(float(x_temp))
                 y.append(float(y_temp))
+
             elif result[3] != None:
                 y_temp = result[3]
                 x_temp = x[len(x) - 1]  # get last input
@@ -38,7 +35,14 @@ with open(fileName, "r", encoding='utf-8-sig') as f:
                 x.append(float(x_temp))
                 y.append(float(x_temp))
 
-print(len(x))
+
+
+            print(x_temp)
+            #print(y_temp)
+            # print(counter)
+            # counter = counter+12
+
+#print(*zip(x,y))
 
 
 

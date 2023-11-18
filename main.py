@@ -97,7 +97,6 @@ def plot(x_coord, y_coord, theta, L1, L2):
 
 
 def GcodeConverter(fileName):
-
     x = []
     y = []
 
@@ -106,13 +105,29 @@ def GcodeConverter(fileName):
         lines2 = lines.splitlines()
 
         for line in lines2:
-            result = (re.search(r"X([\S]+) Y([\S]+)", line)).groups()
+            match = re.search(r"X(\S*) Y(\S*)|X(\S*)|  Y(\S*)", line)
 
-            x_temp = result[0]
-            y_temp = (result[1])
+            if match != None:  # if we find a match
+                result = match.groups()
 
-            x.append(float(x_temp))
-            y.append(float(y_temp))
+                if result[0] != None:
+                    x_temp = result[0]
+                    y_temp = (result[1])
+
+                    x.append(float(x_temp))
+                    y.append(float(y_temp))
+                elif result[2] != None:
+                    x_temp = result[2]
+                    y_temp = y[len(y) - 1]  # get last input
+
+                    x.append(float(x_temp))
+                    y.append(float(y_temp))
+                elif result[3] != None:
+                    y_temp = result[3]
+                    x_temp = x[len(x) - 1]  # get last input
+
+                    x.append(float(x_temp))
+                    y.append(float(y_temp))
 
     return x, y
 
@@ -309,7 +324,7 @@ def ChangeSelectPathButton():
     global L1
     global L2
 
-    numCases = 6
+    numCases = 7
 
     if ActivePath >= numCases-1:
         ActivePath=0
@@ -340,11 +355,19 @@ def ChangeSelectPathButton():
             pathX = (8 * np.sin(u*.9))
             pathY = 8 * np.sin(u)
         case 5:
+            tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience.gc")
+            tempX = np.array(tempX)/10-8
+            tempY = np.array(tempY)/10-8
 
-            pathX, pathY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience2.txt")
-            pathX = np.array(pathX)/10-8
-            pathY = np.array(pathY)/10-8
+            pathX = tempX[1:400]
+            pathY = tempY[1:400]
+        case 6:
+            tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\grid.gc")
+            tempX = np.array(tempX) - 5
+            tempY = np.array(tempY) - 5
 
+            pathX = tempX
+            pathY = tempY
 
 
         case default: #rectangle
