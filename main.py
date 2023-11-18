@@ -7,6 +7,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 import scipy.optimize
 import progressbar
+import csv
+
+FileName = r"C:\Users\Ericw\Desktop\topSecretedata.csv"
 
 L1 = 10
 L2 = 10
@@ -200,7 +203,6 @@ def set_coordinates_state(x_coord, y_coord):
 
             theta = calculate_angles(thisXCoord, thisYCoord, L1, L2)
             if not ErrorFlag:
-
                 # generate and plot the graph
                 plot(thisXCoord, thisYCoord, theta, L1, L2)
                 theta1_deg[i] = int(theta[0] * 180 / np.pi)
@@ -285,7 +287,7 @@ def ChangeSelectPathButton():
     global L1
     global L2
 
-    numCases = 5
+    numCases = 6
 
     if ActivePath >= numCases-1:
         ActivePath=0
@@ -315,6 +317,26 @@ def ChangeSelectPathButton():
             u = np.linspace(0, 15 * np.pi, 400)
             pathX = (8 * np.sin(u*.9))
             pathY = 8 * np.sin(u)
+        case 5:
+            with open(FileName, 'r') as f:
+                reader = csv. reader(f,delimiter=',')
+
+                pathX = np.zeros(401)
+                pathY = np.zeros(401)
+
+                for index, row in enumerate(reader):
+
+
+                    pathX[index]=float(row[0])/10-8
+                    pathY[index]=float(row[1])/10 - 10
+
+                    if index == 400:
+                        break
+
+
+
+
+
         case default: #rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
             pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
