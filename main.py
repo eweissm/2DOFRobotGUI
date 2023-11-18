@@ -8,6 +8,7 @@ import numpy as np
 import scipy.optimize
 import progressbar
 import csv
+import re
 
 FileName = r"C:\Users\Ericw\Desktop\topSecretedata.csv"
 
@@ -93,6 +94,27 @@ def plot(x_coord, y_coord, theta, L1, L2):
 
     # placing the canvas on the Tkinter window
     canvas.get_tk_widget().place(relx=0, rely=0)
+
+
+def GcodeConverter(fileName):
+
+    x = []
+    y = []
+
+    with open(fileName, "r", encoding='utf-8-sig') as f:
+        lines = f.read()
+        lines2 = lines.splitlines()
+
+        for line in lines2:
+            result = (re.search(r"X([\S]+) Y([\S]+)", line)).groups()
+
+            x_temp = result[0]
+            y_temp = (result[1])
+
+            x.append(float(x_temp))
+            y.append(float(y_temp))
+
+    return x, y
 
 
 def startupPlot(L1, L2):
@@ -318,22 +340,10 @@ def ChangeSelectPathButton():
             pathX = (8 * np.sin(u*.9))
             pathY = 8 * np.sin(u)
         case 5:
-            with open(FileName, 'r') as f:
-                reader = csv. reader(f,delimiter=',')
 
-                pathX = np.zeros(401)
-                pathY = np.zeros(401)
-
-                for index, row in enumerate(reader):
-
-
-                    pathX[index]=float(row[0])/10-8
-                    pathY[index]=float(row[1])/10 - 10
-
-                    if index == 400:
-                        break
-
-
+            pathX, pathY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience2.txt")
+            pathX = np.array(pathX)/10-8
+            pathY = np.array(pathY)/10-8
 
 
 

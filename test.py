@@ -1,17 +1,22 @@
-import numpy as np
-def NormalizeAngle(angle):
-    if angle > 2*np.pi:
-        solution = angle - abs(np.floor(angle / (2*np.pi)) * 2 * np.pi)
-        print("angle > 2pi")
-    elif angle < 0:
-        solution = angle + abs(np.floor(angle / (2*np.pi)) * 2 * np.pi)
-        print("angle < 2pi")
-    else:
-        solution = angle
-        print("angle did not need to be normalized")
+import re
 
-    return solution
+FileName = r"C:\Users\Ericw\Desktop\TopScience2.txt"
 
-angle_deg = 1500
-angle = angle_deg * np.pi / 180
-print(NormalizeAngle(angle) * 180/ np.pi)
+x=[]
+y=[]
+
+with open(FileName,"r", encoding='utf-8-sig') as f:
+    lines = f.read()
+    lines2 = lines.splitlines()
+
+    for line in lines2:
+        result = (re.search(r"X([\S]+) Y([\S]+)", line)).groups()
+
+        x_temp = result[0]
+        y_temp = (result[1])
+
+        x.append(float(x_temp))
+        y.append(float(y_temp))
+
+print(*zip(x,y))
+
