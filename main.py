@@ -19,16 +19,16 @@ def calculate_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
     global counter
-    global prevTheta1 # previous solution to theta1
+    global prevTheta1  # previous solution to theta1
 
     counter = 0
     ErrorFlag = True
 
     while ErrorFlag and counter<5:
 
-        solution,infodict, ier, msg =scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))), full_output=1)
+        solution,infodict, ier, msg = scipy.optimize.fsolve(func, theta0, args=(tuple((x, y, L1, L2))), full_output=1)
 
-        #normalize angles
+        # normalize angles
         solution[1] = NormalizeAngle(solution[1])
 
         if solution[1] > 3*np.pi/2 or solution[1] < np.pi/2 or ier != 1 or abs(solution[0]-prevTheta1) > 2*np.pi:
@@ -73,23 +73,24 @@ def plot(x_coord, y_coord, theta, L1, L2):
     plot1.plot(x, y, color='black', linestyle='dashed')
     plot1.plot(-x, y, color='black', linestyle='dashed')
 
-
     # plotting path
     plot1.plot(pathX, pathY, color='blue', linestyle='dashed')
 
     # plotting the arm
     plot1.plot(0, 0, marker="o", markersize=20)
-    plot1.plot(x_coord, y_coord, marker="o", markersize=10 )
+    plot1.plot(x_coord, y_coord, marker="o", markersize=10)
     plot1.plot(L1*np.cos(theta[0]), L1*np.sin(theta[0]), marker="o", markersize=20)
     plot1.plot([0, L1*np.cos(theta[0])], [0, L1*np.sin(theta[0])])
-    plot1.plot([L1 * np.cos(theta[0]),x_coord], [L1 * np.sin(theta[0]), y_coord])
+    plot1.plot([L1 * np.cos(theta[0]), x_coord], [L1 * np.sin(theta[0]), y_coord])
+
     # creating the Tkinter canvas
     # containing the Matplotlib figure
     canvas = FigureCanvasTkAgg(fig, master=RightFrame)
     canvas.draw()
 
     # placing the canvas on the Tkinter window
-    canvas.get_tk_widget().place(relx = 0, rely = 0)
+    canvas.get_tk_widget().place(relx=0, rely=0)
+
 
 def startupPlot(L1, L2):
     global pathX
@@ -122,7 +123,8 @@ def startupPlot(L1, L2):
     # placing the canvas on the Tkinter window
     canvas.get_tk_widget().place(relx=0, rely=0)
 
-#normalize angle between 0 and 2*pi
+
+# normalize angle between 0 and 2*pi
 def NormalizeAngle(angle):
     if angle > 2*np.pi:
         solution = angle - abs(np.floor(angle / (2*np.pi)) * 2 * np.pi)
@@ -131,6 +133,7 @@ def NormalizeAngle(angle):
     else:
         solution = angle
     return solution
+
 
 def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
     """
@@ -149,26 +152,30 @@ def generate_semicircle(center_x, center_y, radius, stepsize=0.1):
 
     return x, y + center_y
 
+
 def StartPathFollow():
     global pathX
     global pathY
 
     set_coordinates_state(pathX, pathY)
 
-#when update button is pressed--> take entered coordinates and caclulate new coordinates, then update graph, then send to serial
+
+# when update button is pressed--> take entered coordinates and calculate new coordinates, then update graph, then send
+# to serial
 def set_coordinates_state(x_coord, y_coord):
     try:
-        NumEntries= len(x_coord)
+        NumEntries = len(x_coord)
     # handle list / array case
     except TypeError:
         NumEntries = 1
     # oops, was a float
 
-    global theta #angles of joints 1 and 2
+    global theta  # angles of joints 1 and 2
     global L1
     global L2
     global ErrorFlag
-    #define arm lengths
+
+    # define arm lengths
     L1 = 10
     L2 = 10
 
@@ -179,7 +186,7 @@ def set_coordinates_state(x_coord, y_coord):
 
     CheckSerialCounter = 3  # how many times we will check the serial before giving up
 
-    #Pre-Calculate inverse Kinematics calculation
+    # Pre-Calculate inverse Kinematics calculation
     print("Calculating Angles...")
     with progressbar.ProgressBar(max_value=NumEntries) as bar:
         for i in range(NumEntries):
@@ -191,12 +198,10 @@ def set_coordinates_state(x_coord, y_coord):
                 thisXCoord = x_coord
                 thisYCoord = y_coord
 
-
             theta = calculate_angles(thisXCoord, thisYCoord, L1, L2)
             if not ErrorFlag:
-                #print(theta * 180 / np.pi)
 
-                #generate and plot the graph
+                # generate and plot the graph
                 plot(thisXCoord, thisYCoord, theta, L1, L2)
                 theta1_deg[i] = int(theta[0] * 180 / np.pi)
                 theta2_deg[i] = int(theta[1] * 180 / np.pi)
@@ -214,7 +219,7 @@ def set_coordinates_state(x_coord, y_coord):
 
             start = time.time()
 
-            #send serial data to arduino
+            # send serial data to arduino
             ser.write(bytes(str(theta1_deg[i]), 'UTF-8'))
             ser.write(bytes('A', 'UTF-8'))
             ser.write(bytes(str(theta2_deg[i]-90), 'UTF-8'))
@@ -226,15 +231,16 @@ def set_coordinates_state(x_coord, y_coord):
             print("ExpectedTime: " + ExpectedTime_string)
 
             try:
-                ExpectedTime = max(float(ExpectedTime_string), 0.1)  # convert expected time to float (minimum time is 0.005s)
+                # convert expected time to float (minimum time is 0.005s)
+                ExpectedTime = max(float(ExpectedTime_string), 0.1)
             except ValueError:
                 ExpectedTime = 0.1
 
             ser.reset_input_buffer()  # clear input buffer
 
             # if we get a 'y' from arduino, we move on, otherwise we will wait 0.5 sec. We will repeat this 5 times.
-            # After which, if we still do not have confirmation, we will print to the monitor that there was a problem and
-            # move on
+            # After which, if we still do not have confirmation, we will print to the monitor that there was a problem
+            # and move on
             DidMoveWork = False
             counter = 0
             ArduinoMessage = ''
@@ -254,22 +260,24 @@ def set_coordinates_state(x_coord, y_coord):
                     time.sleep(ExpectedTime/2)
                     counter = counter + 1
 
-
             if not DidMoveWork:
                 print("Move was not successful")
 
-            ser.reset_input_buffer() #clear input buffer
+            ser.reset_input_buffer()  # clear input buffer
             end = time.time()
-            print("Difference between expected time and actual time: " + str(end- start - ExpectedTime))
+            print("Difference between expected time and actual time: " + str(end - start - ExpectedTime))
+
 
 def func(angles, x, y, L1, L2):
     return [L1*np.cos(angles[0])+L2*(np.cos(angles[1])*np.cos(angles[0])-np.sin(angles[1])*np.sin(angles[0]))-x, L1*np.sin(angles[0])+L2*(np.cos(angles[1])*np.sin(angles[0])+np.sin(angles[1])*np.cos(angles[0]))-y]
-    #return np.sqrt((L1 * np.cos(angles[0]) + L2 * (np.cos(angles[1]) * np.cos(angles[0]) - np.sin(angles[1]) * np.sin(angles[0])) - x)**2 + (L1 * np.sin(angles[0]) + L2 * (np.cos(angles[1]) * np.sin(angles[0]) + np.sin(angles[1]) * np.cos(angles[0])) - y)**2)
 
-#set path defaults
+
+# set path defaults
 ActivePath = 0
 pathX = [5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5, -3, -1, 1, 3, 5]
 pathY = [-5, -3, -1, 1, 3, 5, 5, 5, 5, 5, 5, 3, 1, -1, -3, -5, -5, -5, -5, -5, -5]
+
+
 def ChangeSelectPathButton():
     global ActivePath
     global pathX
@@ -285,15 +293,15 @@ def ChangeSelectPathButton():
         ActivePath=ActivePath+1
 
     match ActivePath:
-        case 0: #rectangle
+        case 0:  # rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
             pathY = [-5, -3, -1, 1, 3, 5, 5, 5 , 5,  5,  5,   3,   1, -1, -3,  -5, -5, -5,-5,-5,-5]
-        case 1: #involute of circle
+        case 1:  # involute of circle
             u = np.linspace(0, 6.5 * np.pi, 150)
             c = .45
             pathX = (c * (np.cos(u) + u * np.sin(u)))
             pathY = c * (np.sin(u) - u * np.cos(u))
-        case 2:  # Heart
+        case 2: # Heart
             u = np.linspace(0,  2 * np.pi, 100)
             c = .3
             pathX = (6*c*np.sin(u))**3
@@ -313,16 +321,19 @@ def ChangeSelectPathButton():
 
     startupPlot(L1, L2)
 
-#set up serial comms--------------------------------------------------------------------------------------------------------------------------------------------------
-ser = serial.Serial('com4', 9600, timeout=10) #create Serial Object, baud = 9600, read times out after 10s
-time.sleep(3) #delay 3 seconds to allow serial com to get established
+# set up serial comms---------------------------------------------------------------------------------------------------
 
-# Build GUI------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ser = serial.Serial('com4', 9600, timeout=10) # create Serial Object, baud = 9600, read times out after 10s
+time.sleep(3)  # delay 3 seconds to allow serial com to get established
+
+# Build GUI------------------------------------------------------------------------------------------------------------
 tkTop = tk.Tk()  # Create GUI Box
 tkTop.geometry('1200x800')  # size of GUI
 tkTop.title("2 DOF GUI")  # title in top left of window
 
-Title = tk.Label(text='Enter the desired coordinates of the 2 DOF arm', font=("Courier", 14, 'bold')).pack()  # Title on top middle of screen
+# Title on top middle of screen
+Title = tk.Label(text='Enter the desired coordinates of the 2 DOF arm', font=("Courier", 14, 'bold')).pack()
 
 # Fill in the left Side------------------------------------------------------------------------------------------------
 leftFrame = tk.Frame(master=tkTop, width=600) # create frame for the entry controls
@@ -343,13 +354,13 @@ x_coord_entry.pack(side='top', ipadx=0, padx=0, pady=0)
 y_coord_entry = tk.Entry(EntryFrame)
 y_coord_entry.pack(side='top', ipadx=0, padx=0, pady=0)
 
-#set intial coords to zero.
+# set initial coords to zero
 x_coord_entry.insert(0,0)
 y_coord_entry.insert(0,0)
 
 UpdateCoordsButton = tk.Button(EntryFrame,
                                    text="Update Coordinates",
-                                   command=lambda:set_coordinates_state(float(x_coord_entry.get()),float(y_coord_entry.get())),
+                                   command=lambda: set_coordinates_state(float(x_coord_entry.get()),float(y_coord_entry.get())),
                                    height=4,
                                    fg="black",
                                    width=20,
@@ -390,4 +401,5 @@ RightFrame = tk.Frame(master=tkTop, width=600, bg="gray")
 RightFrame.pack(fill=tk.BOTH, side=tk.LEFT, expand=True)
 startupPlot(L1, L2)
 
-tk.mainloop() # run loop watching for gui interactions
+# run loop watching for gui interactions
+tk.mainloop()
