@@ -245,15 +245,23 @@ def set_coordinates_state(x_coord, y_coord):
             numberOfPathSteps = math.ceil(PathLength/1)
 
             # Find X and Y coordinates along the path
-            Xsteps = np.linspace(prev_X_and_Y[0], thisXCoord, numberOfPathSteps)
-            if prev_X_and_Y[0] < thisXCoord:
-                Ysteps = np.interp(Xsteps, [prev_X_and_Y[0], thisXCoord], [prev_X_and_Y[1], thisYCoord])
+            if thisXCoord != prev_X_and_Y[0]:
+                Xsteps = np.linspace(prev_X_and_Y[0], thisXCoord, numberOfPathSteps)
+                if prev_X_and_Y[0] < thisXCoord:
+                    Ysteps = np.interp(Xsteps, [prev_X_and_Y[0], thisXCoord], [prev_X_and_Y[1], thisYCoord])
+                else:
+                    Ysteps = np.interp(Xsteps, [thisXCoord, prev_X_and_Y[0]], [thisYCoord, prev_X_and_Y[1]])
             else:
-                Ysteps = np.interp(Xsteps, [thisXCoord, prev_X_and_Y[0]], [thisYCoord, prev_X_and_Y[1]])
+                Ysteps = np.linspace(prev_X_and_Y[1], thisYCoord, numberOfPathSteps)
+                if prev_X_and_Y[1] < thisYCoord:
+                    Xsteps = np.interp(Ysteps, [prev_X_and_Y[1], thisYCoord], [prev_X_and_Y[0], thisXCoord])
+                else:
+                    Xsteps = np.interp(Ysteps, [thisYCoord, prev_X_and_Y[1]], [thisXCoord, prev_X_and_Y[0]])
 
             prev_X_and_Y = [thisXCoord, thisYCoord]  # update prev_X_and_Y
 
             for j in range(len(Xsteps)):
+
 
                 theta = calculate_joint_angles(Xsteps[j], Ysteps[j], L1, L2)
                 if not ErrorFlag:
@@ -268,6 +276,7 @@ def set_coordinates_state(x_coord, y_coord):
             bar.update(i)
 
     print("Done Calculating Angles")
+
 
     # Run through the angles
     if not ErrorFlag:
