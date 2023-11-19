@@ -337,8 +337,8 @@ def ChangeSelectPathButton():
         case 2: # Heart
             u = np.linspace(0,  2 * np.pi, 100)
             c = .3
-            pathX = (6*c*np.sin(u))**3
-            pathY = 13*c*np.cos(u)-5*c*np.cos(2*u)-2*c*np.cos(3*u)-c*np.cos(4*u)
+            pathX = (7*c*np.sin(u))**3
+            pathY = (15*c*np.cos(u)-5*c*np.cos(2*u)-2*c*np.cos(3*u)-c*np.cos(4*u))*1.5
         case 3:  # lemniscate
             u = np.linspace(0, 2 * np.pi, 50)
             c = 5
@@ -350,8 +350,8 @@ def ChangeSelectPathButton():
             pathY = 8 * np.sin(u)
         case 5: #Gcode input
             tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience.gc")
-            tempX = np.array(tempX)/10-8
-            tempY = np.array(tempY)/10-8
+            tempX = np.array(tempX)/8-8
+            tempY = np.array(tempY)/8-15
 
             pathX = tempX[1:400]
             pathY = tempY[1:400]
