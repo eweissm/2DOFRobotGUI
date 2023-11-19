@@ -7,7 +7,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import scipy.optimize
 import progressbar
-import csv
 import re
 
 FileName = r"C:\Users\Ericw\Desktop\topSecretedata.csv"
@@ -224,8 +223,6 @@ def set_coordinates_state(x_coord, y_coord):
 
     ser.reset_input_buffer()  # clear input buffer
 
-    CheckSerialCounter = 3  # how many times we will check the serial before giving up
-
     # Pre-Calculate inverse Kinematics calculation
     print("Calculating Angles...")
     with progressbar.ProgressBar(max_value=NumEntries) as bar:
@@ -290,7 +287,7 @@ def set_coordinates_state(x_coord, y_coord):
             while time.time()-MoveStartTime < ExpectedTime*4 and not DidMoveWork:
                 if ser.inWaiting():
                     ArduinoMessage = ser.read(1)  # read one bit from buffer
-                    print(ArduinoMessage)
+                    #print(ArduinoMessage)
 
                 if ArduinoMessage == b'y':
                     DidMoveWork = True
@@ -351,14 +348,14 @@ def ChangeSelectPathButton():
             u = np.linspace(0, 15 * np.pi, 400)
             pathX = (8 * np.sin(u*.9))
             pathY = 8 * np.sin(u)
-        case 5:
+        case 5: #Gcode input
             tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience.gc")
             tempX = np.array(tempX)/10-8
             tempY = np.array(tempY)/10-8
 
             pathX = tempX[1:400]
             pathY = tempY[1:400]
-        case 6:
+        case 6: #Gcode input
             tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\grid.gc")
             tempX = np.array(tempX) - 5
             tempY = np.array(tempY) - 5
@@ -374,8 +371,6 @@ def ChangeSelectPathButton():
     startupPlot(L1, L2)
 
 # set up serial comms---------------------------------------------------------------------------------------------------
-
-
 ser = serial.Serial('com4', 9600, timeout=10) # create Serial Object, baud = 9600, read times out after 10s
 time.sleep(3)  # delay 3 seconds to allow serial com to get established
 
