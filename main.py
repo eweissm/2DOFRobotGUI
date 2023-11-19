@@ -8,6 +8,7 @@ import numpy as np
 import scipy.optimize
 import progressbar
 import re
+import math
 
 FileName = r"C:\Users\Ericw\Desktop\topSecretedata.csv"
 
@@ -18,7 +19,7 @@ theta0 = [0, 0]
 prevTheta1 = 0
 
 
-def calculate_angles(x, y, L1, L2):
+def calculate_joint_angles(x, y, L1, L2):
     global theta0
     global ErrorFlag
     global counter
@@ -199,27 +200,28 @@ def StartPathFollow():
     set_coordinates_state(pathX, pathY)
 
 
+
+prev_X_and_Y = [0,0]
 # when update button is pressed--> take entered coordinates and calculate new coordinates, then update graph, then send
 # to serial
 def set_coordinates_state(x_coord, y_coord):
-    try:
-        NumEntries = len(x_coord)
-    # handle list / array case
-    except TypeError:
-        NumEntries = 1
-    # oops, was a float
-
     global theta  # angles of joints 1 and 2
     global L1
     global L2
-    global ErrorFlag
+    global prev_X_and_Y  # Previous X and Y coordinates
+
+    try:
+        NumEntries = len(x_coord)
+    # handle list / array case
+    except TypeError:  # oops, was a float
+        NumEntries = 1
 
     # define arm lengths
     L1 = 10
     L2 = 10
 
-    theta1_deg = np.zeros(NumEntries)
-    theta2_deg = np.zeros(NumEntries)
+    theta1_deg = []
+    theta2_deg = []
 
     ser.reset_input_buffer()  # clear input buffer
 
@@ -228,22 +230,40 @@ def set_coordinates_state(x_coord, y_coord):
     with progressbar.ProgressBar(max_value=NumEntries) as bar:
         for i in range(NumEntries):
             if NumEntries > 1:
-
                 thisXCoord = x_coord[i]
                 thisYCoord = y_coord[i]
             else:
                 thisXCoord = x_coord
                 thisYCoord = y_coord
 
-            theta = calculate_angles(thisXCoord, thisYCoord, L1, L2)
-            if not ErrorFlag:
-                # generate and plot the graph
-                plot(thisXCoord, thisYCoord, theta, L1, L2)
-                theta1_deg[i] = int(theta[0] * 180 / np.pi)
-                theta2_deg[i] = int(theta[1] * 180 / np.pi)
+            # In order to allow the arm to move in approximately straight lines between 2 points, we will discretize the
+            # path taken between two point such that no 2 points along the path are greater than 1 cm
+
+            #Length of straight line from current coords to target coords
+            PathLength = np.sqrt((thisXCoord-prev_X_and_Y[0])**2 + (thisYCoord-prev_X_and_Y[1])**2)
+
+            numberOfPathSteps = math.ceil(PathLength/1)
+
+            # Find X and Y coordinates along the path
+            Xsteps = np.linspace(prev_X_and_Y[0], thisXCoord, numberOfPathSteps)
+            if prev_X_and_Y[0] < thisXCoord:
+                Ysteps = np.interp(Xsteps, [prev_X_and_Y[0], thisXCoord], [prev_X_and_Y[1], thisYCoord])
             else:
-                print("Failed to Calculate Coordinate: "+str(i))
-                break
+                Ysteps = np.interp(Xsteps, [thisXCoord, prev_X_and_Y[0]], [thisYCoord, prev_X_and_Y[1]])
+
+            prev_X_and_Y = [thisXCoord, thisYCoord]  # update prev_X_and_Y
+
+            for j in range(len(Xsteps)):
+
+                theta = calculate_joint_angles(Xsteps[j], Ysteps[j], L1, L2)
+                if not ErrorFlag:
+                    # generate and plot the graph
+                    plot(thisXCoord, thisYCoord, theta, L1, L2)
+                    theta1_deg.append(int(theta[0] * 180 / np.pi))
+                    theta2_deg.append(int(theta[1] * 180 / np.pi))
+                else:
+                    print("Failed to Calculate Coordinate: "+str(i))
+                    break
 
             bar.update(i)
 
@@ -251,7 +271,7 @@ def set_coordinates_state(x_coord, y_coord):
 
     # Run through the angles
     if not ErrorFlag:
-        for i in range(NumEntries):
+        for i in range(len(theta1_deg)):
 
             start = time.time()
 
