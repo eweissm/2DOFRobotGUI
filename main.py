@@ -347,7 +347,7 @@ def ChangeSelectPathButton():
     global L1
     global L2
 
-    numCases = 8
+    numCases = 9
 
     if ActivePath >= numCases-1:
         ActivePath=0
@@ -377,13 +377,10 @@ def ChangeSelectPathButton():
             u = np.linspace(0, 15 * np.pi, 400)
             pathX = (8 * np.sin(u*.9))
             pathY = 8 * np.sin(u)
-        case 5: #Gcode input
-            tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience.gc")
-            tempX = np.array(tempX)/10-8
-            tempY = np.array(tempY)/10-12
-
-            pathX = tempX[1:400]
-            pathY = tempY[1:400]
+        case 5:
+            u = np.linspace(0, 2 * np.pi, 400)
+            pathX = 7 * np.sin(7*u)
+            pathY = 7 * np.cos(5*u)
         case 6: #Gcode input
             tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\squareSpiral.gc")
             tempX = np.array(tempX)/15- 7.5
@@ -410,6 +407,10 @@ def ChangeSelectPathButton():
 
                 pathX.append(-radiusSizeChange*(i+1))
                 pathY.append(-radiusSizeChange*(i+1))
+        case 8: # modified lemniscate
+            u = np.linspace(0, 30 * np.pi, 800)
+            pathX = 1.4*(np.cos(u) + 0.05*u*np.sin(3*u))
+            pathY = 1.4*(np.sin(2*u) + 0.05*u*np.cos(3*u))
 
         case default: #rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
