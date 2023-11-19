@@ -347,7 +347,7 @@ def ChangeSelectPathButton():
     global L1
     global L2
 
-    numCases = 7
+    numCases = 8
 
     if ActivePath >= numCases-1:
         ActivePath=0
@@ -362,7 +362,7 @@ def ChangeSelectPathButton():
             u = np.linspace(0, 6.5 * np.pi, 150)
             c = .45
             pathX = (c * (np.cos(u) + u * np.sin(u)))
-            pathY = c * (np.sin(u) - u * np.cos(u))
+            pathY = (c * (np.sin(u) - u * np.cos(u)))
         case 2: # Heart
             u = np.linspace(0,  2 * np.pi, 100)
             c = .3
@@ -391,6 +391,25 @@ def ChangeSelectPathButton():
 
             pathX = tempX
             pathY = tempY
+        case 7:  # Spiral Squares
+            numberOfLoops = 8
+            radiusSizeChange = 1
+
+            pathX = [0]
+            pathY = [0]
+
+            for i in range(numberOfLoops):
+                pathX.append(radiusSizeChange*(i+1))
+                pathY.append(pathY[len(pathY)-1])
+
+                pathX.append(radiusSizeChange*(i+1))
+                pathY.append(radiusSizeChange*(i+1))
+
+                pathX.append(-radiusSizeChange*(i+1))
+                pathY.append(radiusSizeChange*(i+1))
+
+                pathX.append(-radiusSizeChange*(i+1))
+                pathY.append(-radiusSizeChange*(i+1))
 
         case default: #rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
