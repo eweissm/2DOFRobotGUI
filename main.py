@@ -350,19 +350,18 @@ def ChangeSelectPathButton():
             pathY = 8 * np.sin(u)
         case 5: #Gcode input
             tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\TopScience.gc")
-            tempX = np.array(tempX)/8-8
-            tempY = np.array(tempY)/8-15
+            tempX = np.array(tempX)/10-8
+            tempY = np.array(tempY)/10-12
 
             pathX = tempX[1:400]
             pathY = tempY[1:400]
         case 6: #Gcode input
-            tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\grid.gc")
-            tempX = np.array(tempX) - 5
-            tempY = np.array(tempY) - 5
+            tempX, tempY = GcodeConverter(r"C:\Users\Ericw\Desktop\squareSpiral.gc")
+            tempX = np.array(tempX)/15- 7.5
+            tempY = np.array(tempY)/15 - 7.5
 
             pathX = tempX
             pathY = tempY
-
 
         case default: #rectangle
             pathX = [ 5,  5,  5, 5, 5, 5, 3, 1, -1, -3, -5 , -5 , -5, -5, -5 , -5, -3, -1, 1, 3, 5]
